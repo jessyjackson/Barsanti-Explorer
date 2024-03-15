@@ -1,8 +1,8 @@
-﻿using Barsanti_Explorer.Models;
+﻿using BarsantiExplorer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Barsanti_Explorer.Controllers
+namespace BarsantiExplorer.Controllers
 {
     public class HomeController : Controller
     {

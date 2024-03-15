@@ -1,4 +1,4 @@
-namespace Barsanti_Explorer.Models
+namespace BarsantiExplorer.Models
 {
     public class ErrorViewModel
     {
