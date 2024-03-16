@@ -10,6 +10,7 @@ public class Trip : BaseEntity
     public String Address { get; set; }
     public String Latitude { get; set; }
     public String Longitude { get; set; }
+    public String GeoHash { get; set; }
     
     [ForeignKey("TripType")] 
     public int TypeId { get; set; }
