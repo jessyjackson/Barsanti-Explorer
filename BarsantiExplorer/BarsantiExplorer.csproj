@@ -10,8 +10,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Models\Requests\" />
-    <Folder Include="Models\Responses\" />
+    <Folder Include="uploads\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
