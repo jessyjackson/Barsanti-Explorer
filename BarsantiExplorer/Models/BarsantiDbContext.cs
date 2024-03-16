@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BarsantiExplorer.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 namespace BarsantiExplorer.Models
 {
     public class BarsantiDbContext : DbContext
@@ -10,7 +13,6 @@ namespace BarsantiExplorer.Models
         public DbSet<Entities.User> Users { get; set; }
         public BarsantiDbContext(DbContextOptions<BarsantiDbContext> options) : base(options)
         {
-
         }
     }
 }
