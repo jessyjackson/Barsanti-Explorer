@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Folder Include="Models\Requests\" />
+    <Folder Include="Models\Responses\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
