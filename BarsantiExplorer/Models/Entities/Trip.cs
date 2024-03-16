@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BarsantiExplorer.Models.Entities;
 
-public class Trip
+public class Trip: BaseEntity
 {
     public String Title { get; set; }
     public String Description { get; set; }
