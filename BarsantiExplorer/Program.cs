@@ -1,5 +1,5 @@
 using System.Reflection;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using BarsantiExplorer.TelegramBot;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -14,6 +14,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(SetupSwaggerDocumentation);
 builder.Services.AddMvc();
+//telegram bot
+builder.Services.AddHostedService(serviceProvider => new Bot(
+    builder.Configuration.GetValue<string>("BotApiToken"))
+);
+
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<BarsantiExplorer.Models.BarsantiDbContext>(options =>
