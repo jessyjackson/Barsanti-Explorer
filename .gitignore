@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 *.Development.json
 */uploads/**
+BarsantiExplorer/appsettings.Development.json
