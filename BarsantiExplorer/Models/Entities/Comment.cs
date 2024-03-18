@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BarsantiExplorer.Models.Responses;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BarsantiExplorer.Models.Entities
@@ -14,5 +15,14 @@ namespace BarsantiExplorer.Models.Entities
         [ForeignKey("Trip")]
         public int TripId { get; set; }
         public virtual Trip Trip { get; set; }
+        public CommentResponse CommentToCommentResponse()
+        {
+            return new CommentResponse
+            {
+                Title = this.Title,
+                Text = this.Text,
+                Trip = this.Trip
+            };
+        }
     }
 }

@@ -3,7 +3,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
-using System.Security.Cryptography;
 
 namespace BarsantiExplorer.TelegramBot
 {
@@ -67,7 +66,7 @@ namespace BarsantiExplorer.TelegramBot
         }
         public async void DoWork()
         {
-            throw new NotImplementedException();
+            BotClient.SendTextMessageAsync(chatId: 5822417084, text: "Hello World");
         } 
 
 

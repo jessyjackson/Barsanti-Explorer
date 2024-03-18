@@ -2,9 +2,8 @@
 {
     public class GetCommentsRequest
     {
-        public string? Text { get; set; }
-        public string? Title { get; set; }
-        public int? TripId { get; set; }
+        public string? TripTitle { get; set; }
+        public string? Sort { get; set; }
     }
 
 }

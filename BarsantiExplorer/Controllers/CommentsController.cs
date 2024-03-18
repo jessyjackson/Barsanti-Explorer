@@ -4,7 +4,8 @@ using BarsantiExplorer.Models.Requests.Comments;
 using BarsantiExplorer.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace BarsantiExplorer.Controllers;
 
@@ -12,6 +13,36 @@ namespace BarsantiExplorer.Controllers;
 [Route("api/comments")]
 public class CommentsController: BaseController
 {
+    /// <summary>
+    ///  Get filtered comments
+    /// </summary>
+    /// <response code="200">Returns filtered trips</response>
+    [HttpGet("")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(List<Comment>), StatusCodes.Status200OK)]
+    public IActionResult getComments([FromQuery] GetCommentsRequest queryParams)
+    {
+        var comments = DB.Comments
+            .Include(c => c.Trip)
+            .AsQueryable();
+
+        if (queryParams.TripTitle != null)
+        {
+            comments = comments.Where(c => c.Trip.Title == queryParams.TripTitle);
+        }
+        if(queryParams.Sort != null)
+        {
+            comments = comments.OrderBy(queryParams.Sort);
+        }
+        var final = comments.Select(c => c.CommentToCommentResponse());
+
+        if (final.ToList().Count == 0)
+        {
+            return NotFound();
+        }
+        return Ok(final);
+    }
+
     /// <summary>
     /// Get a comment
     /// </summary>
@@ -32,18 +63,6 @@ public class CommentsController: BaseController
         }
         return Ok(comment);
     }
-    /// <summary>
-    ///  Get filtered comments
-    /// </summary>
-    /// <response code="200">Returns filtered trips</response>
-    [HttpGet("")]
-    [Produces("application/json")]
-    [ProducesResponseType(typeof(List<Comment>), StatusCodes.Status200OK)]
-    public IActionResult getComments([FromQuery] GetCommentsRequest queryParams)
-    {
-        return Ok();
-    }
-
 
     /// <summary>
     /// Delete a comment

@@ -15,9 +15,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(SetupSwaggerDocumentation);
 builder.Services.AddMvc();
 //telegram bot
-builder.Services.AddHostedService(serviceProvider => new Bot(
-    builder.Configuration.GetValue<string>("BotApiToken"))
+Bot telegramBot = new(
+    builder.Configuration.GetValue<string>("BotApiToken")
 );
+builder.Services.AddHostedService(serviceProvider => telegramBot);
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
