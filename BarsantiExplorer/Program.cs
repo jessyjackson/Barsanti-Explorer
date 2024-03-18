@@ -21,7 +21,6 @@ builder.Services.AddHostedService(serviceProvider => new Bot(
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<BarsantiExplorer.Models.BarsantiDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
