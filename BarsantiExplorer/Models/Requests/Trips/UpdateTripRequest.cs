@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BarsantiExplorer.Models.Requests;
+namespace BarsantiExplorer.Models.Requests.Trips;
 
 public class UpdateTripRequest
 {

@@ -11,9 +11,6 @@ namespace BarsantiExplorer.Models.Entities
         [MaxLength(150)]
         public string Text { get; set; }
         
-        [MaxLength(256)]
-        public string Image { get; set; }
-
         [ForeignKey("Trip")]
         public int TripId { get; set; }
         public virtual Trip Trip { get; set; }

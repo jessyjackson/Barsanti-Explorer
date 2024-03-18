@@ -1,4 +1,4 @@
-namespace BarsantiExplorer.Models.Requests;
+namespace BarsantiExplorer.Models.Requests.Trips;
 
 public class GetTripsRequest
 {

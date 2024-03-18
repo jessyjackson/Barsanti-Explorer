@@ -1,6 +1,6 @@
 using BarsantiExplorer.Models;
 using BarsantiExplorer.Models.Entities;
-using BarsantiExplorer.Models.Requests;
+using BarsantiExplorer.Models.Requests.Trips;
 using BarsantiExplorer.Models.Responses;
 using Geohash;
 using Microsoft.AspNetCore.Http.Extensions;

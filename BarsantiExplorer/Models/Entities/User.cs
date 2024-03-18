@@ -11,5 +11,6 @@ namespace BarsantiExplorer.Models.Entities
         public string Password { get; set; }
         
         public int? TelegramId { get; set; }
+        public int? TelegramUserRegistrationId { get; set; }
     }
 }
