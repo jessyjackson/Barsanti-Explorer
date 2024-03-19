@@ -3,6 +3,7 @@ using BarsantiExplorer.Models.Entities;
 using BarsantiExplorer.Models.Requests.Trips;
 using BarsantiExplorer.Models.Responses;
 using Geohash;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace BarsantiExplorer.Controllers;
 [Route("api/trips")]
 public class TripsController : BaseController
 {
-    private Geohasher _geoHasher = new Geohasher();
+    private Geohasher _geoHasher = new();
 
     public TripsController(BarsantiDbContext context, IConfiguration appSettings) : base(context, appSettings)
     {
@@ -106,7 +107,8 @@ public class TripsController : BaseController
     /// <summary>
     /// Create a new trip
     /// </summary>
-    /// <response code="200">Returns the new trips data</response>
+    /// <response code="200">Returns the new trips data</response>  
+    [Authorize]
     [HttpPost("")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TripResponse), StatusCodes.Status200OK)]
@@ -155,6 +157,7 @@ public class TripsController : BaseController
     /// update a trip
     /// </summary>
     /// <response code="200">Returns the updated trips data</response>
+    [Authorize]
     [HttpPut("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TripResponse), StatusCodes.Status200OK)]
@@ -208,6 +211,7 @@ public class TripsController : BaseController
     /// Delete a trip
     /// </summary>
     /// <response code="200">Returns true if the trip was deleted successfully</response>
+    [Authorize]
     [HttpDelete("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]

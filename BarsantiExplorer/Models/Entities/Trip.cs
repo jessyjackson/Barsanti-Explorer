@@ -20,6 +20,9 @@ public class Trip : BaseEntity
 
     [MaxLength(12)] public string GeoHash { get; set; }
 
+    //public int RatingsNumber { get; set; }
+    //public double TripRating { get { return 0; } private set { } }
+
     [ForeignKey("TripType")] public int TypeId { get; set; }
 
     public virtual TripType TripType { get; set; }

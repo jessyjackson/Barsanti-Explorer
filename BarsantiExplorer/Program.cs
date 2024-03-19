@@ -1,5 +1,7 @@
 using System.Reflection;
+using BarsantiExplorer.Services;
 using BarsantiExplorer.TelegramBot;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -14,14 +16,43 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(SetupSwaggerDocumentation);
 builder.Services.AddMvc();
+
+
+
 //telegram bot
 Bot telegramBot = new(
     builder.Configuration.GetValue<string>("BotApiToken")
 );
 builder.Services.AddHostedService(serviceProvider => telegramBot);
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+//auth
+var jwtOptions = builder.Configuration
+    .GetSection("JwtOptions")
+    .Get<JwtOptions>();
 
+builder.Services.AddSingleton(jwtOptions);
+
+builder.Services.AddAuthentication(cfg => {
+    cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+        {
+        options.TokenValidationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidAudience = jwtOptions.Audience,
+                IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey()
+            };
+        });
+
+builder.Services.AddAuthorization();
+// database
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<BarsantiExplorer.Models.BarsantiDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -41,6 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

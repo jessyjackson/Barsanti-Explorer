@@ -11,7 +11,8 @@ namespace BarsantiExplorer.Models.Entities
         
         [MaxLength(150)]
         public string Text { get; set; }
-        
+        public bool IsAccepted { get; set; }
+
         [ForeignKey("Trip")]
         public int TripId { get; set; }
         public virtual Trip Trip { get; set; }
@@ -21,7 +22,6 @@ namespace BarsantiExplorer.Models.Entities
             {
                 Title = this.Title,
                 Text = this.Text,
-                Trip = this.Trip
             };
         }
     }

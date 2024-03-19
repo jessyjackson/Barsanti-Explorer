@@ -3,6 +3,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
+using BarsantiExplorer.Models;
 
 namespace BarsantiExplorer.TelegramBot
 {
@@ -64,9 +65,9 @@ namespace BarsantiExplorer.TelegramBot
             
             await BotClient.SendTextMessageAsync(chatId:message.Chat,text: reply);
         }
-        public async void DoWork()
+        public async void BroadcastComment()
         {
-            BotClient.SendTextMessageAsync(chatId: 5822417084, text: "Hello World");
+            //BotClient.SendTextMessageAsync(chatId: 5822417084, text: "Hello World");
         } 
 
 
