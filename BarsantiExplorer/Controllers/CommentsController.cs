@@ -19,7 +19,7 @@ public class CommentsController: BaseController
     ///  Get filtered comments
     /// </summary>
     /// <response code="200">Returns filtered comments</response>
-    //[Authorize]
+    [Authorize]
     [HttpGet("")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(List<Comment>), StatusCodes.Status200OK)]

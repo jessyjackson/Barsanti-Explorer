@@ -39,17 +39,17 @@ builder.Services.AddAuthentication(cfg => {
     }).AddJwtBearer(options =>
         {
         options.TokenValidationParameters = new()
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtOptions.Issuer,
-                ValidAudience = jwtOptions.Audience,
-                IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey()
-            };
-        });
+        {
 
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey(),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
 builder.Services.AddAuthorization();
 // database
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;

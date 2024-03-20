@@ -21,13 +21,28 @@ public class AuthController: BaseController
     {
        JwtOptions = appSettings.GetSection("JwtOptions").Get<JwtOptions>()!;
     }
-
+    /// <summary>
+    /// Login
+    /// </summary>
+    /// <response code="200">Returns the jwt Token</response> 
+    /// <responde code="400">If the username or password are invalid</response>
     [HttpPost("")]
     public IActionResult GenerateToken([FromForm] AuthTokenRequest authTokenRequest)
     {
+        var user = DB.Users.FirstOrDefault(u => u.Email == authTokenRequest.Email);
+        if (user == null)
+        {
+            return BadRequest("Invalid Username");
+        }
+        if (user.Password != authTokenRequest.Password)
+        {
+            return BadRequest("Invalid Password");
+        }
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Email, authTokenRequest.Email)
+            new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Email,authTokenRequest.Email),
+            new(JwtRegisteredClaimNames.Sub,authTokenRequest.Email),
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -44,7 +59,8 @@ public class AuthController: BaseController
         };
 
         var token = tokenHandler.CreateToken(tokenDescription);
-        return Ok(token);
+        var jwt = tokenHandler.WriteToken(token);
+        return Ok(jwt);
     }
 
 }

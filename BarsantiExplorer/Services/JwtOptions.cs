@@ -12,7 +12,6 @@ namespace BarsantiExplorer.Services
 
         internal SecurityKey GetSymmetricSecurityKey()
         {
-            Console.WriteLine("SigningKey: " + SigningKey);
             return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SigningKey));
         }
     }
