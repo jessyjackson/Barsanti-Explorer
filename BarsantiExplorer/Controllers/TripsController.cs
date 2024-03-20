@@ -62,7 +62,8 @@ public class TripsController : BaseController
 
         if (queryParams.Sort != null)
         {
-            trips = trips.OrderBy(queryParams.Sort + " " + queryParams.Order);
+            var order = queryParams.Order ?? "desc";
+            trips = trips.OrderBy(queryParams.Sort + " " + order);
         }
 
         int pageItems = 20;

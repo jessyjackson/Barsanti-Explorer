@@ -2,7 +2,7 @@
 {
     public class GetCommentsRequest
     {
-        public string? TripTitle { get; set; }
+        public int? TripId { get; set; }
         public string? Sort { get; set; }
     }
 

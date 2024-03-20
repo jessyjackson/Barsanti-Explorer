@@ -11,10 +11,12 @@ using System.Linq.Dynamic.Core;
 namespace BarsantiExplorer.Controllers;
 [ApiController]
 [Route("api/comments")]
-public class CommentsController: BaseController
+public class CommentsController : BaseController
 {
     public CommentsController(BarsantiDbContext context, IConfiguration appSettings) : base(context, appSettings)
-    { }
+    {
+    }
+
     /// <summary>
     ///  Get filtered comments
     /// </summary>
@@ -26,24 +28,19 @@ public class CommentsController: BaseController
     public IActionResult GetComments([FromQuery] GetCommentsRequest queryParams)
     {
         var comments = DB.Comments
-            .Include(c => c.Trip)
             .AsQueryable();
 
-        if (queryParams.TripTitle != null)
+        if (queryParams.TripId != null)
         {
-            comments = comments.Where(c => c.Trip.Title == queryParams.TripTitle);
+            comments = comments.Where(c => c.TripId == queryParams.TripId);
         }
-        if(queryParams.Sort != null)
+
+        if (queryParams.Sort != null)
         {
             comments = comments.OrderBy(queryParams.Sort);
         }
-        var final = comments.Select(c => c.CommentToCommentResponse());
 
-        if (final.ToList().Count == 0)
-        {
-            return NotFound();
-        }
-        return Ok(final);
+        return Ok(comments);
     }
 
     /// <summary>
@@ -60,11 +57,13 @@ public class CommentsController: BaseController
         var comment = DB.Comments
             .Include(c => c.Trip)
             .FirstOrDefault(c => c.Id == id);
+        
         if (comment == null)
         {
             return NotFound();
         }
-        return Ok(comment);
+
+        return Ok(comment.MapToCommentResponse());
     }
     /// <summary>
     /// Create a new comment
@@ -120,6 +119,7 @@ public class CommentsController: BaseController
         {
             return NotFound();
         }
+
         comment.DeletedAt = DateTime.Now;
         DB.SaveChanges();
         return Ok(true);

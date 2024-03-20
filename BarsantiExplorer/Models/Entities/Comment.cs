@@ -16,7 +16,7 @@ namespace BarsantiExplorer.Models.Entities
         [ForeignKey("Trip")]
         public int TripId { get; set; }
         public virtual Trip Trip { get; set; }
-        public CommentResponse CommentToCommentResponse()
+        public CommentResponse MapToCommentResponse()
         {
             return new CommentResponse
             {
