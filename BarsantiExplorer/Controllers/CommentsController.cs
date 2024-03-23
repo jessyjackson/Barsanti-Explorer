@@ -83,7 +83,7 @@ public class CommentsController : BaseController
         };
         DB.Comments.Add(comment);
         DB.SaveChanges();
-        return Ok(comment.CommentToCommentResponse());
+        return Ok(comment.MapToCommentResponse());
     }
     /// <summary>
     /// Accept deny comment
@@ -102,7 +102,7 @@ public class CommentsController : BaseController
         }
         comment.IsAccepted = acceptComment.IsAccepted;
         DB.SaveChanges();
-        return Ok(comment.CommentToCommentResponse());
+        return Ok(comment.MapToCommentResponse());
     }
 
     /// <summary>
