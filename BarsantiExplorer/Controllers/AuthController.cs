@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace BarsantiExplorer.Controllers;
@@ -21,28 +22,28 @@ public class AuthController: BaseController
     {
        JwtOptions = appSettings.GetSection("JwtOptions").Get<JwtOptions>()!;
     }
+    
     /// <summary>
     /// Login
     /// </summary>
     /// <response code="200">Returns the jwt Token</response> 
-    /// <responde code="400">If the username or password are invalid</response>
-    [HttpPost("")]
-    public IActionResult GenerateToken([FromForm] AuthTokenRequest authTokenRequest)
+    /// <response code="401">If the username or password are invalid</response>
+    [ProducesResponseType(typeof(LoginResponse),200)]
+    [ProducesResponseType(401)]
+    [HttpPost("login")]
+    public IActionResult Login([FromBody] LoginRequest body)
     {
-        var user = DB.Users.FirstOrDefault(u => u.Email == authTokenRequest.Email);
-        if (user == null)
+        var user = DB.Users.FirstOrDefault(u => u.Email == body.Email);
+        if (user == null || user.Password != body.Password)
         {
-            return BadRequest("Invalid Username");
+            return Unauthorized();
         }
-        if (user.Password != authTokenRequest.Password)
-        {
-            return BadRequest("Invalid Password");
-        }
+        
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Email,authTokenRequest.Email),
-            new(JwtRegisteredClaimNames.Sub,authTokenRequest.Email),
+            new(JwtRegisteredClaimNames.Email,body.Email),
+            new(JwtRegisteredClaimNames.Sub,body.Email),
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -60,7 +61,40 @@ public class AuthController: BaseController
 
         var token = tokenHandler.CreateToken(tokenDescription);
         var jwt = tokenHandler.WriteToken(token);
-        return Ok(jwt);
+        
+        var response = new LoginResponse() 
+        {
+            User = user,
+            Token = jwt
+        };
+        
+        return Ok(response);
     }
 
+
+    /// <summary>
+    /// Get current user
+    /// </summary>
+    /// <response code="200">Returns the current user</response>
+    /// <response code="401">If the user is not authenticated</response>
+    [ProducesResponseType(typeof(User), 200)]
+    [ProducesResponseType(401)]
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var email = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
+        if (email == null)
+        {
+            return Unauthorized();
+        }
+
+        var user = DB.Users.FirstOrDefault(u => u.Email == email);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(user);
+    }
 }
