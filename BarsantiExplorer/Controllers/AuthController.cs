@@ -73,20 +73,6 @@ public class AuthController: BaseController
         
         return Ok(response);
     }
-    /// <summary>
-    /// Return the user data
-    /// </summary>
-    /// <response code="200">Returns the user data</response>
-    [Authorize]
-    [HttpGet("me")]
-    public IActionResult Me()
-    {
-        var header = this.Request.Headers;
-        var token = header["Authorization"].ToString().Replace("Bearer ", "");
-        var mail = new JwtSecurityToken(token).Claims.First(c => c.Type == "sub").Value;
-        var user = DB.Users.FirstOrDefault(u => u.Email == mail);
-        return Ok(user);
-    }
 
 
     /// <summary>

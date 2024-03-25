@@ -13,4 +13,5 @@ public class TripResponse: BaseEntity
     public double Longitude { get; set; }
     public string GeoHash { get; set; }
     public TripType TripType { get; set; }
+    public double AvarageRating { get; set; }
 }

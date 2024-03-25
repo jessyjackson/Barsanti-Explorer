@@ -1,5 +1,4 @@
-﻿using EntityFramework.Triggers;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BarsantiExplorer.Models.Entities

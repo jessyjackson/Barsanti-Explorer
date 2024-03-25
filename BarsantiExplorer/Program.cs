@@ -2,7 +2,6 @@ using System.Reflection;
 using BarsantiExplorer.Models;
 using BarsantiExplorer.Services;
 using BarsantiExplorer.TelegramBot;
-using EntityFramework.Triggers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -21,7 +20,7 @@ builder.Services.AddMvc();
 
 //telegram bot
 Bot telegramBot = new(
-    builder.Configuration.GetValue<string>("BotApiToken")
+    builder.Configuration["BotApiToken"]
 );
 builder.Services.AddHostedService(serviceProvider => telegramBot);
 
@@ -30,7 +29,6 @@ var jwtOptions = builder.Configuration
     .GetSection("JwtOptions")
     .Get<JwtOptions>();
 
-builder.Services.AddSingleton(jwtOptions);
 
 builder.Services.AddAuthentication(cfg =>
 {
@@ -55,7 +53,6 @@ builder.Services.AddAuthorization();
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<BarsantiDbContext>(options =>
 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-builder.Services.AddTriggers();
 
 
 var app = builder.Build();
@@ -79,7 +76,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var uploadsFolder = builder.Configuration.GetValue<string>("UploadDir");
+var uploadsFolder = builder.Configuration["UploadDir"];
+Console.WriteLine($"Uploads folder: {uploadsFolder}");
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, uploadsFolder)),

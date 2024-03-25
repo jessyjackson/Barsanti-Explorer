@@ -1,5 +1,4 @@
 ﻿using BarsantiExplorer.Models.Entities;
-using EntityFramework.Triggers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BarsantiExplorer.Models

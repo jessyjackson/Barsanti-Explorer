@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BarsantiExplorer.Models.Responses;
 using Microsoft.EntityFrameworkCore;
-using EntityFramework.Triggers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BarsantiExplorer.Models.Entities;
@@ -25,7 +24,9 @@ public class Trip : BaseEntity
     public int RatingsNumber { get ; set; }
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public double TotalRating { get { return TotalRating / RatingsNumber; } private set { } }
+    public double TotalRating { get; private set; }
+    [NotMapped]
+    public double AvarageRating => RatingsNumber == 0 ? 0 : TotalRating / RatingsNumber;
 
     [ForeignKey("TripType")] public int TypeId { get; set; }
 
@@ -45,7 +46,8 @@ public class Trip : BaseEntity
             GeoHash = this.GeoHash,
             TripType = this.TripType,
             CreatedAt = this.CreatedAt,
-            DeletedAt = this.DeletedAt
+            DeletedAt = this.DeletedAt,
+            AvarageRating = this.AvarageRating
         };
     }
 }
