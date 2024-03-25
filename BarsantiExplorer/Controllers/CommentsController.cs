@@ -72,7 +72,7 @@ public class CommentsController : BaseController
     [HttpPost("")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CommentResponse), StatusCodes.Status200OK)]
-    public IActionResult CreateComment([FromForm] CreateCommentRequest request)
+    public IActionResult CreateComment([FromBody] CreateCommentRequest request)
     {
         var comment = new Comment
         {
@@ -94,9 +94,7 @@ public class CommentsController : BaseController
     [HttpPost("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CommentResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult AcceptComment(int id,[FromForm] AcceptCommentRequest acceptComment)
+    public IActionResult AcceptComment(int id,[FromBody] AcceptCommentRequest acceptComment)
     {
         var comment = DB.Comments.Find(id);
         if (comment == null)

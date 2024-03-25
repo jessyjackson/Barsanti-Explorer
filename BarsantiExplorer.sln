@@ -15,6 +15,7 @@ Global
 		{657E2343-EE29-49BA-87B9-81AC2044716A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{657E2343-EE29-49BA-87B9-81AC2044716A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{657E2343-EE29-49BA-87B9-81AC2044716A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{657E2343-EE29-49BA-87B9-81AC2044716A}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

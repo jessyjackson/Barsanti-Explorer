@@ -1,15 +1,28 @@
+import SearchBar from "@/components/SearchBar/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import apiClient from "@/data/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
+	const navigate = useNavigate();
+
 	const bestRatedTripsQuery = useQuery({
 		queryKey: ["bestRatedTrips"],
 		queryFn: async () => {
-			const res = await apiClient.tripsApi.apiTripsGet();
+			const res = await apiClient.tripsApi.apiTripsGet(
+				undefined,
+				undefined,
+				"rating",
+				"desc",
+				0,
+				5
+			);
+
 			return res.data;
 		},
 	});
@@ -19,23 +32,21 @@ function LandingPage() {
 			<h1 className="text-6xl font-extrabold text-center">
 				Discover new places
 			</h1>
-			<div className="flex justify-center mt-10">
-				<Card className="max-w-3xl w-full p-3 rounded-full flex items-center">
-					<Input
-						placeholder="Search for a place or a trip"
-						className="max-w-lg w-full p-4 border-none shadow-none focus-visible:ring-0 text-lg"
-					/>
-					<Button className="text-lg p-6 bg-primary text-white rounded-full ml-auto">
-						Search
-					</Button>
-				</Card>
+			<div className="max-w-3xl mx-auto mt-10">
+				<SearchBar
+					onSearch={(place, category) => {
+						navigate("/trips", {
+							state: { place, category },
+						});
+					}}
+				/>
 			</div>
 			<div className="mt-20">
 				<h2 className="text-3xl font-bold">Best Rated</h2>
 				<div className="grid grid-cols-3 gap-12 mt-8">
-					<Card className="h-96" />
-					<Card className="h-96" />
-					<Card className="h-96" />
+					<Skeleton className="w-full h-96" />
+					<Skeleton className="w-full h-96" />
+					<Skeleton className="w-full h-96" />
 				</div>
 			</div>
 		</main>

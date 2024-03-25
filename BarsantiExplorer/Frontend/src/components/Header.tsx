@@ -1,10 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import logoImg from "../assets/logo.png";
+import blackLogo from "../assets/logo-black.png";
+import whiteLogo from "../assets/logo-white.png";
 import { LuMapPin, LuPlane, LuUser } from "react-icons/lu";
+import { ModeToggle } from "./ThemeSwitcher";
+import { useTheme } from "./ThemeProvider";
 
 function Header() {
+	const { theme } = useTheme();
+
+	const logoImg = theme === "dark" ? whiteLogo : blackLogo;
+
 	return (
 		<header className="py-8 px-12 flex items-center">
 			<Link to="/">
@@ -24,13 +31,14 @@ function Header() {
 					</Button>
 				</Link>
 			</div>
-			<div className="w-48 flex justify-end">
+			<div className="w-48 flex justify-end items-center">
 				<Link to="/login">
 					<Button variant="ghost" className="p-6">
 						<LuUser className="text-2xl mr-2" />
 						<p className="text-xl">Login</p>
 					</Button>
 				</Link>
+				<ModeToggle />
 			</div>
 		</header>
 	);

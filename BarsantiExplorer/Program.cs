@@ -19,8 +19,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(SetupSwaggerDocumentation);
 builder.Services.AddMvc();
 
-
-
 //telegram bot
 Bot telegramBot = new(
     builder.Configuration.GetValue<string>("BotApiToken")
@@ -34,24 +32,24 @@ var jwtOptions = builder.Configuration
 
 builder.Services.AddSingleton(jwtOptions);
 
-builder.Services.AddAuthentication(cfg => {
+builder.Services.AddAuthentication(cfg =>
+{
     cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(options =>
-        {
-        options.TokenValidationParameters = new()
-        {
-
-            ValidIssuer = jwtOptions.Issuer,
-            ValidAudience = jwtOptions.Audience,
-            IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey(),
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
-    });
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new()
+    {
+        ValidIssuer = jwtOptions.Issuer,
+        ValidAudience = jwtOptions.Audience,
+        IssuerSigningKey = jwtOptions.GetSymmetricSecurityKey(),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
+    };
+});
 builder.Services.AddAuthorization();
 // database
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;

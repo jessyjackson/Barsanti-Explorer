@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
+import { LuLoader2 } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -38,6 +38,7 @@ export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
+	loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -48,7 +49,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				className={cn(buttonVariants({ variant, size, className }))}
 				ref={ref}
 				{...props}
-			/>
+				disabled={props.disabled || props.loading}
+			>
+				{props.loading ? (
+					<LuLoader2 className="w-5 h-5 animate-spin" aria-hidden />
+				) : (
+					props.children
+				)}
+			</Comp>
 		);
 	}
 );
