@@ -51,7 +51,8 @@ namespace BarsantiExplorer.TelegramBot
                 return;
             }
             if (messageText == "test") { 
-                await SendTextMessageAsync(botClient, message,"This is a test", cancellationToken);
+                Console.WriteLine(message);
+                await SendTextMessageAsync(botClient, message,Convert.ToString(message.Chat.Id), cancellationToken);
             }
             else
             {

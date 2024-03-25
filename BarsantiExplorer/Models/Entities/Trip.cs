@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BarsantiExplorer.Models.Responses;
 using Microsoft.EntityFrameworkCore;
+using EntityFramework.Triggers;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BarsantiExplorer.Models.Entities;
 
@@ -20,8 +22,10 @@ public class Trip : BaseEntity
 
     [MaxLength(12)] public string GeoHash { get; set; }
 
-    //public int RatingsNumber { get; set; }
-    //public double TripRating { get { return 0; } private set { } }
+    public int RatingsNumber { get ; set; }
+
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public double TotalRating { get { return TotalRating / RatingsNumber; } private set { } }
 
     [ForeignKey("TripType")] public int TypeId { get; set; }
 

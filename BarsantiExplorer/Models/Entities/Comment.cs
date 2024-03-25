@@ -1,4 +1,6 @@
-﻿using BarsantiExplorer.Models.Responses;
+﻿using BarsantiExplorer.Enum;
+using BarsantiExplorer.Models.Responses;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +13,8 @@ namespace BarsantiExplorer.Models.Entities
         
         [MaxLength(150)]
         public string Text { get; set; }
-        public bool IsAccepted { get; set; }
+        public int Rating { get; set; }
+        public CommentStatus Status { get; set; }
 
         [ForeignKey("Trip")]
         public int TripId { get; set; }

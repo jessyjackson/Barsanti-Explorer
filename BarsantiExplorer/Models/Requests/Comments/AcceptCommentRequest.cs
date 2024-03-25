@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BarsantiExplorer.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace BarsantiExplorer.Models.Requests.Comments
 {
     public class AcceptCommentRequest
     {
-        [Required] public bool IsAccepted { get; set; }
+        [Required] public CommentStatus Status  { get; set; }
     }
 }

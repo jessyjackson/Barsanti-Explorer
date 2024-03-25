@@ -1,6 +1,8 @@
 using System.Reflection;
+using BarsantiExplorer.Models;
 using BarsantiExplorer.Services;
 using BarsantiExplorer.TelegramBot;
+using EntityFramework.Triggers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -53,8 +55,10 @@ builder.Services.AddAuthentication(cfg => {
 builder.Services.AddAuthorization();
 // database
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddDbContext<BarsantiExplorer.Models.BarsantiDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<BarsantiDbContext>(options =>
+options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddTriggers();
+
 
 var app = builder.Build();
 

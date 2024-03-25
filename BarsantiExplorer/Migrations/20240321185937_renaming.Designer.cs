@@ -4,6 +4,7 @@ using BarsantiExplorer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BarsantiExplorer.Migrations
 {
     [DbContext(typeof(BarsantiDbContext))]
-    partial class BarsantiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240321185937_renaming")]
+    partial class renaming
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,7 +62,7 @@ namespace BarsantiExplorer.Migrations
 
                     b.HasIndex("TripId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("BarsantiExplorer.Models.Entities.Trip", b =>
@@ -119,7 +122,7 @@ namespace BarsantiExplorer.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Trips", (string)null);
+                    b.ToTable("Trips");
                 });
 
             modelBuilder.Entity("BarsantiExplorer.Models.Entities.TripType", b =>
@@ -143,7 +146,7 @@ namespace BarsantiExplorer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TripTypes", (string)null);
+                    b.ToTable("TripTypes");
                 });
 
             modelBuilder.Entity("BarsantiExplorer.Models.Entities.User", b =>
@@ -175,7 +178,7 @@ namespace BarsantiExplorer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("BarsantiExplorer.Models.Entities.Comment", b =>

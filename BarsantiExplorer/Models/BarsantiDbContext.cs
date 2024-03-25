@@ -1,9 +1,6 @@
 ﻿using BarsantiExplorer.Models.Entities;
+using EntityFramework.Triggers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Newtonsoft.Json.Bson;
-using System.Transactions;
 
 namespace BarsantiExplorer.Models
 {
@@ -14,9 +11,6 @@ namespace BarsantiExplorer.Models
         public DbSet<Entities.TripType> TripTypes { get; set; }
         public DbSet<Entities.User> Users { get; set; }
         public BarsantiDbContext(DbContextOptions<BarsantiDbContext> options) : base(options)
-        {
-        }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
         }
