@@ -32,6 +32,8 @@ public class Trip : BaseEntity
 
     public virtual TripType TripType { get; set; }
     
+    public virtual List<Comment> Comments { get; set; }
+    
     public TripResponse MapToTripResponse(IConfiguration appSettings, String host)
     {
         return new TripResponse

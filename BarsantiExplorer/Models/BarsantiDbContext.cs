@@ -9,6 +9,7 @@ namespace BarsantiExplorer.Models
         public DbSet<Entities.Trip> Trips { get; set; }
         public DbSet<Entities.TripType> TripTypes { get; set; }
         public DbSet<Entities.User> Users { get; set; }
+
         public BarsantiDbContext(DbContextOptions<BarsantiDbContext> options) : base(options)
         {
 
