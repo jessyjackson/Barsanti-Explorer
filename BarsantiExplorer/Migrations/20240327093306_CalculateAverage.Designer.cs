@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BarsantiExplorer.Migrations
 {
     [DbContext(typeof(BarsantiDbContext))]
-    [Migration("20240325092215_triggers")]
-    partial class triggers
+    [Migration("20240327093306_CalculateAverage")]
+    partial class CalculateAverage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,10 @@ namespace BarsantiExplorer.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<double>("AverageRating")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("double");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");

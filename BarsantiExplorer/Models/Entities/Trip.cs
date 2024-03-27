@@ -25,8 +25,9 @@ public class Trip : BaseEntity
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public double TotalRating { get; private set; }
-    [NotMapped]
-    public double AvarageRating => RatingsNumber == 0 ? 0 : TotalRating / RatingsNumber;
+
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public double AverageRating { get; set; }
 
     [ForeignKey("TripType")] public int TypeId { get; set; }
 
@@ -47,7 +48,7 @@ public class Trip : BaseEntity
             TripType = this.TripType,
             CreatedAt = this.CreatedAt,
             DeletedAt = this.DeletedAt,
-            AvarageRating = this.AvarageRating
+            AvarageRating = this.AverageRating
         };
     }
 }
