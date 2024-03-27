@@ -9,8 +9,9 @@ export default defineConfig({
 		port: 3000,
 		proxy: {
 			"/api": {
-				target: "http://localhost:5202",
+				target: "https://explorer.barsanti.edu.it",
 				changeOrigin: true,
+				secure: false,
 			},
 			"/auth": {
 				target: "http://localhost:5202",

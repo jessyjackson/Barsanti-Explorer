@@ -29,7 +29,7 @@ function TripsSearchPage() {
 				undefined,
 				undefined,
 				undefined,
-				page,
+				page - 1,
 				20,
 				searchedPlace?.center[0],
 				searchedPlace?.center[1]

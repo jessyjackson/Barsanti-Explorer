@@ -1,11 +1,12 @@
 import SearchBar from "@/components/SearchBar/SearchBar";
+import TripCard from "@/components/TripCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiClient from "@/data/apiClient";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
@@ -17,7 +18,7 @@ function LandingPage() {
 			const res = await apiClient.tripsApi.apiTripsGet(
 				undefined,
 				undefined,
-				"rating",
+				"TotalRating",
 				"desc",
 				0,
 				5
@@ -26,6 +27,26 @@ function LandingPage() {
 			return res.data;
 		},
 	});
+
+	const buildBestRatedTrips = useCallback(() => {
+		if (bestRatedTripsQuery.isLoading) {
+			return (
+				<div className="grid grid-cols-3 gap-12 mt-8">
+					<Skeleton className="w-full h-96" />
+					<Skeleton className="w-full h-96" />
+					<Skeleton className="w-full h-96" />
+				</div>
+			);
+		}
+
+		return (
+			<div className="grid grid-cols-3 gap-12 mt-8">
+				{bestRatedTripsQuery.data?.map((trip) => (
+					<TripCard trip={trip} key={`trip-${trip.id}`} />
+				))}
+			</div>
+		);
+	}, [bestRatedTripsQuery]);
 
 	return (
 		<main className="page mt-16">
@@ -43,11 +64,7 @@ function LandingPage() {
 			</div>
 			<div className="mt-20">
 				<h2 className="text-3xl font-bold">Best Rated</h2>
-				<div className="grid grid-cols-3 gap-12 mt-8">
-					<Skeleton className="w-full h-96" />
-					<Skeleton className="w-full h-96" />
-					<Skeleton className="w-full h-96" />
-				</div>
+				{buildBestRatedTrips()}
 			</div>
 		</main>
 	);
