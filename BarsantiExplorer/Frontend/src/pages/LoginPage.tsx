@@ -12,6 +12,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useAuthStore } from "@/store/authStore";
+import { AxiosError } from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
 	email: z.string().email(),
@@ -19,13 +23,28 @@ const formSchema = z.object({
 });
 
 function Login() {
+	const auth = useAuthStore();
+	const { toast } = useToast();
+	const navigate = useNavigate();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 	});
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values);
-	}
+	const onSubmit = async (values: z.infer<typeof formSchema>) => {
+		try {
+			await auth.login(values.email, values.password);
+			navigate("/admin");
+		} catch (error) {
+			const err = error as AxiosError;
+			toast({
+				title: "Error",
+				description: err.message,
+				variant: "destructive",
+				duration: 1500,
+			});
+		}
+	};
 
 	return (
 		<main className="page flex items-center">
@@ -65,7 +84,11 @@ function Login() {
 							</FormItem>
 						)}
 					/>
-					<Button type="submit" className="w-full mt-6">
+					<Button
+						type="submit"
+						className="w-full mt-6"
+						loading={form.formState.isSubmitting}
+					>
 						Login
 					</Button>
 				</form>

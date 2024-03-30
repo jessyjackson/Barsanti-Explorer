@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using BarsantiExplorer.Enum;
 
 namespace BarsantiExplorer.Controllers;
+
 [ApiController]
 [Route("api/comments")]
 public class CommentsController : BaseController
@@ -28,16 +30,19 @@ public class CommentsController : BaseController
     public IActionResult GetComments([FromQuery] GetCommentsRequest queryParams)
     {
         var comments = DB.Comments
-            .AsQueryable();
+            .Where(el => el.Status == CommentStatus.Approved)
+            .Where(el => el.DeletedAt == null);
 
         if (queryParams.TripId != null)
         {
             comments = comments.Where(c => c.TripId == queryParams.TripId);
         }
 
-        if (queryParams.Sort != null)
+        if (queryParams.Page != null && queryParams.Limit != null)
         {
-            comments = comments.OrderBy(queryParams.Sort);
+            comments = comments
+                .Skip(queryParams.Page.Value * queryParams.Limit.Value)
+                .Take(queryParams.Limit.Value);
         }
 
         return Ok(comments);
@@ -56,8 +61,9 @@ public class CommentsController : BaseController
     {
         var comment = DB.Comments
             .Include(c => c.Trip)
+            .Where(c => c.DeletedAt == null)
             .FirstOrDefault(c => c.Id == id);
-        
+
         if (comment == null)
         {
             return NotFound();
@@ -65,6 +71,7 @@ public class CommentsController : BaseController
 
         return Ok(comment.MapToCommentResponse());
     }
+
     /// <summary>
     /// Create a new comment
     /// </summary>
@@ -76,7 +83,8 @@ public class CommentsController : BaseController
     {
         var comment = new Comment
         {
-            Title = request.Title,
+            Author = request.Author,
+            Rating = request.Rating,
             Text = request.Text,
             TripId = request.TripId,
             CreatedAt = DateTime.Now
@@ -85,6 +93,7 @@ public class CommentsController : BaseController
         DB.SaveChanges();
         return Ok(comment.MapToCommentResponse());
     }
+
     /// <summary>
     /// Accept deny comment
     /// </summary>
@@ -94,13 +103,14 @@ public class CommentsController : BaseController
     [HttpPost("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CommentResponse), StatusCodes.Status200OK)]
-    public IActionResult AcceptComment(int id,[FromBody] AcceptCommentRequest acceptComment)
+    public IActionResult AcceptComment(int id, [FromBody] AcceptCommentRequest acceptComment)
     {
         var comment = DB.Comments.Find(id);
         if (comment == null)
         {
             return NotFound();
         }
+
         comment.Status = acceptComment.Status;
         DB.SaveChanges();
         return Ok(comment.MapToCommentResponse());
@@ -125,6 +135,4 @@ public class CommentsController : BaseController
         DB.SaveChanges();
         return Ok(true);
     }
-
-
 }

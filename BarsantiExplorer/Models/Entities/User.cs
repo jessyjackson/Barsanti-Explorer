@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BarsantiExplorer.Models.Responses;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace BarsantiExplorer.Models.Entities
 {
@@ -13,5 +15,14 @@ namespace BarsantiExplorer.Models.Entities
         public string Password { get; set; }
         
         public int? TelegramId { get; set; }
+        
+        public UserResponse MapToUserResponse()
+        {
+            return new UserResponse
+            {
+                Email = Email,
+                TelegramId = TelegramId
+            };
+        } 
     }
 }

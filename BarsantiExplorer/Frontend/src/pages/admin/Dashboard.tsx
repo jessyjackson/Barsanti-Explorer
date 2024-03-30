@@ -5,8 +5,11 @@ import { FiEdit } from "react-icons/fi";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { BiLogOutCircle } from "react-icons/bi";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 
 function Dashboard() {
+	const auth = useAuthStore();
+
 	return (
 		<main className="page">
 			<h1 className="text-3xl font-bold text-center w-full mb-6 mt-20">
@@ -41,10 +44,18 @@ function Dashboard() {
 					</Button>
 				</Link>
 			</div>
-			<div className="mt-24 w-full">
+			<a href="/swagger">
+				<Button className="mx-auto mt-8 block" variant="link">
+					API documentation
+				</Button>
+			</a>
+			<div className="w-full mt-16">
 				<Button
-					className="mx-auto block text-destructive hover:text-destructive flex gap-2"
+					className="mx-auto text-destructive hover:text-destructive flex gap-2"
 					variant="ghost"
+					onClick={() => {
+						auth.logout();
+					}}
 				>
 					<BiLogOutCircle className="text-2xl" />
 					Logout

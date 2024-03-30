@@ -10,22 +10,38 @@ import TripsSearchPage from "./pages/TripsSearchPage";
 import TripDetailsPage from "./pages/TripDetailsPage";
 import EditTripPage from "./pages/admin/EditTripPage";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/authStore";
+import { Toaster } from "./components/ui/toaster";
+import AdminLayout from "./layout/AdminLayout";
+import ScrollToTop from "./lib/ScrollToTop";
 
 function App() {
+	const auth = useAuthStore();
+
+	useEffect(() => {
+		auth.fetchUser();
+	}, []);
+
 	return (
 		<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-			<Header />
-			<Routes>
-				<Route path="/" element={<LandingPage />} />
-				<Route path="/trips" element={<TripsSearchPage />} />
-				<Route path="/trips/:id" element={<TripDetailsPage />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/admin" element={<Dashboard />} />
-				<Route path="/admin/telegram" element={<SyncTelegramPage />} />
-				<Route path="/admin/trips/new" element={<CreateTripPage />} />
-				<Route path="/admin/trips/:id" element={<EditTripPage />} />
-			</Routes>
-			<Footer />
+			<ScrollToTop>
+				<Header />
+				<Routes>
+					<Route path="/" element={<LandingPage />} />
+					<Route path="/trips" element={<TripsSearchPage />} />
+					<Route path="/trips/:id" element={<TripDetailsPage />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/admin" element={<AdminLayout />}>
+						<Route path="/admin" element={<Dashboard />} />
+						<Route path="/admin/telegram" element={<SyncTelegramPage />} />
+						<Route path="/admin/trips/new" element={<CreateTripPage />} />
+						<Route path="/admin/trips/:id" element={<EditTripPage />} />
+					</Route>
+				</Routes>
+				<Footer />
+				<Toaster />
+			</ScrollToTop>
 		</ThemeProvider>
 	);
 }

@@ -3,7 +3,8 @@
     public class GetCommentsRequest
     {
         public int? TripId { get; set; }
-        public string? Sort { get; set; }
+        public int? Page { get; set; }
+        public int? Limit { get; set; }
     }
 
 }

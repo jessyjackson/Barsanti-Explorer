@@ -11,15 +11,28 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 import apiClient from "@/data/apiClient";
-import { PlaceData } from "@/data/mapBoxClient";
-import { useQuery } from "@tanstack/react-query";
+import mapBoxClient, { PlaceData } from "@/data/mapBoxClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+
+interface TripsSearchPageState {
+	place?: PlaceData;
+}
 
 function TripsSearchPage() {
-	const [searchedPlace, setSearchedPlace] = React.useState<PlaceData>();
+	const { state } = useLocation();
+	const { place } = (state ?? {}) as TripsSearchPageState;
+
+	const [searchedPlace, setSearchedPlace] = React.useState<PlaceData | null>(
+		place ?? null
+	);
 	const [page, setPage] = React.useState(1);
 	const [tripType, setTripType] = React.useState<number>();
+	const [isFetchingMissingPlace, setIsFetchingMissingPlace] =
+		React.useState(false);
 
 	const tripsQuery = useQuery({
 		queryKey: ["bestRatedTrips", page, searchedPlace, tripType],
@@ -39,6 +52,34 @@ function TripsSearchPage() {
 		},
 	});
 
+	const searchBarMutation = useMutation({
+		mutationFn: async (data: {
+			place: PlaceData | string | null;
+			tripType: string;
+		}) => {
+			console.log(data);
+			const { place, tripType } = data;
+
+			let selectedPlace = null;
+			if (typeof place === "string") {
+				if (place.length > 0) {
+					setIsFetchingMissingPlace(true);
+					const suggestions = await mapBoxClient.getPlaces(place);
+					if (suggestions.length > 0) {
+						selectedPlace = suggestions[0];
+					}
+					setIsFetchingMissingPlace(false);
+				}
+			} else {
+				selectedPlace = place;
+			}
+
+			setPage(1);
+			setSearchedPlace(selectedPlace);
+			setTripType(tripType === "all" ? undefined : +tripType);
+		},
+	});
+
 	const buildTripsData = useCallback(() => {
 		if (tripsQuery.error) {
 			return <div className="text-center">Unexpected Error</div>;
@@ -54,10 +95,14 @@ function TripsSearchPage() {
 			);
 		}
 
+		if (tripsQuery.data?.length === 0) {
+			return <div className="text-center">No trips found</div>;
+		}
+
 		return (
 			<div className="grid grid-cols-3 gap-12">
 				{tripsQuery.data?.map((trip) => (
-					<TripCard trip={trip} />
+					<TripCard trip={trip} key={`trip-${trip.id}`} />
 				))}
 			</div>
 		);
@@ -69,31 +114,35 @@ function TripsSearchPage() {
 			<div className="mt-6">
 				<SearchBar
 					tripTypesEnabled
-					onSearch={(place, category) => {}}
+					onSearch={(place, tripType) =>
+						searchBarMutation.mutateAsync({ place, tripType })
+					}
 					cardClassName="p-2"
+					defaultPlace={place}
+					loading={isFetchingMissingPlace}
 				/>
 			</div>
 			<div className="mt-14">{buildTripsData()}</div>
 			<Pagination className="mt-16">
 				<PaginationContent>
-					<PaginationItem
-						className="cursor-pointer"
+					<Button
+						className="p-2"
+						variant="ghost"
+						disabled={page === 1}
 						onClick={() => setPage((prev) => prev - 1)}
 					>
 						<PaginationPrevious />
-					</PaginationItem>
+					</Button>
 					<PaginationItem>
-						<PaginationLink href="#">{page}</PaginationLink>
+						<PaginationLink href="#">Page {page}</PaginationLink>
 					</PaginationItem>
-					<PaginationItem>
-						<PaginationEllipsis />
-					</PaginationItem>
-					<PaginationItem>
-						<PaginationNext
-							className="cursor-pointer"
-							onClick={() => setPage((prev) => prev + 1)}
-						/>
-					</PaginationItem>
+					<Button
+						variant="ghost"
+						disabled={tripsQuery.data?.length !== 20}
+						onClick={() => setPage((prev) => prev + 1)}
+					>
+						<PaginationNext />
+					</Button>
 				</PaginationContent>
 			</Pagination>
 		</main>

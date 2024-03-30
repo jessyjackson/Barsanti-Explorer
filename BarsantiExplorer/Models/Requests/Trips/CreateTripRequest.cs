@@ -12,9 +12,9 @@ public class CreateTripRequest
 
     [MaxLength(100)][Required] public string Address { get; set; }
 
-    [Required] public double Latitude { get; set; }
+    [Required] public String Latitude { get; set; }
 
-    [Required] public double Longitude { get; set; }
+    [Required] public String Longitude { get; set; }
 
     [Range(1, int.MaxValue)] public int TypeId { get; set; }
 }

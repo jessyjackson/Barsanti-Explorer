@@ -1,4 +1,4 @@
-import { CommentsApi, Configuration, TripsApi } from ".";
+import { AuthApi, CommentsApi, Configuration, TripTypesApi, TripsApi } from ".";
 import axios, { AxiosInstance } from "axios";
 
 interface BaseConfig {
@@ -17,12 +17,13 @@ class Api {
 	axiosInstance: AxiosInstance;
 
 	tripsApi: TripsApi;
+	tripTypesApi: TripTypesApi;
 	commentsApi: CommentsApi;
+	authApi: AuthApi;
 
 	constructor(config: ApiConfig = {}) {
 		this.apiBaseUrl = config.baseUrl;
 		this.axiosInstance = axios.create({
-			// useless since swagger code overrides it
 			url: this.apiBaseUrl,
 		});
 		// createAuthResponseInterceptor(
@@ -36,7 +37,6 @@ class Api {
 				accessToken: () => {
 					return localStorage.getItem("accessToken") as string;
 				},
-
 				isJsonMime: () => true,
 			},
 			baseUrl: this.apiBaseUrl,
@@ -49,6 +49,16 @@ class Api {
 			baseConfig.axios
 		);
 		this.commentsApi = new CommentsApi(
+			baseConfig.config,
+			baseConfig.baseUrl,
+			baseConfig.axios
+		);
+		this.authApi = new AuthApi(
+			baseConfig.config,
+			baseConfig.baseUrl,
+			baseConfig.axios
+		);
+		this.tripTypesApi = new TripTypesApi(
 			baseConfig.config,
 			baseConfig.baseUrl,
 			baseConfig.axios

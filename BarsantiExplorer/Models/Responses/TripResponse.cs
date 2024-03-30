@@ -3,7 +3,7 @@ using BarsantiExplorer.Models.Entities;
 
 namespace BarsantiExplorer.Models.Responses;
 
-public class TripResponse: BaseEntity
+public class TripResponse : BaseEntity
 {
     public string Title { get; set; }
     public string Description { get; set; }
@@ -13,5 +13,5 @@ public class TripResponse: BaseEntity
     public double Longitude { get; set; }
     public string GeoHash { get; set; }
     public TripType TripType { get; set; }
-    public double AvarageRating { get; set; }
+    public double AverageRating { get; set; }
 }

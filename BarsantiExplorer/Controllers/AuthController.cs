@@ -18,20 +18,21 @@ namespace BarsantiExplorer.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController: BaseController
+public class AuthController : BaseController
 {
     private JwtOptions JwtOptions { get; set; }
-    public AuthController(BarsantiDbContext context, IConfiguration appSettings) : base(context,appSettings)
+
+    public AuthController(BarsantiDbContext context, IConfiguration appSettings) : base(context, appSettings)
     {
-       JwtOptions = appSettings.GetSection("JwtOptions").Get<JwtOptions>()!;
+        JwtOptions = appSettings.GetSection("JwtOptions").Get<JwtOptions>()!;
     }
-    
+
     /// <summary>
     /// Login
     /// </summary>
     /// <response code="200">Returns the jwt Token</response> 
     /// <response code="401">If the username or password are invalid</response>
-    [ProducesResponseType(typeof(LoginResponse),200)]
+    [ProducesResponseType(typeof(LoginResponse), 200)]
     [ProducesResponseType(401)]
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest body)
@@ -41,12 +42,12 @@ public class AuthController: BaseController
         {
             return Unauthorized();
         }
-        
+
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Email,body.Email),
-            new(JwtRegisteredClaimNames.Sub,body.Email),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Email, body.Email),
+            new(JwtRegisteredClaimNames.Sub, body.Email),
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -64,13 +65,13 @@ public class AuthController: BaseController
 
         var token = tokenHandler.CreateToken(tokenDescription);
         var jwt = tokenHandler.WriteToken(token);
-        
-        var response = new LoginResponse() 
+
+        var response = new LoginResponse()
         {
-            User = user,
+            User = user.MapToUserResponse(),
             Token = jwt
         };
-        
+
         return Ok(response);
     }
 
@@ -78,15 +79,20 @@ public class AuthController: BaseController
     /// <summary>
     /// Get current user
     /// </summary>
+    /// <param name="authorization">The authorization header built into the HTTP request</param>
     /// <response code="200">Returns the current user</response>
     /// <response code="401">If the user is not authenticated</response>
-    [ProducesResponseType(typeof(User), 200)]
+    [ProducesResponseType(typeof(UserResponse), 200)]
     [ProducesResponseType(401)]
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me()
+    public IActionResult Me([FromHeader(Name = "Authorization")] string authorization)
     {
-        var email = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
+        string oldToken = authorization.Split(' ')[1];
+        JwtSecurityTokenHandler handler = new();
+        JwtSecurityToken jwtSecurityToken = handler.ReadJwtToken(oldToken);
+        string? email = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
+
         if (email == null)
         {
             return Unauthorized();
@@ -98,6 +104,6 @@ public class AuthController: BaseController
             return Unauthorized();
         }
 
-        return Ok(user);
+        return Ok(user.MapToUserResponse());
     }
 }

@@ -20,13 +20,24 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "@/data/apiClient";
+import AddressTextField from "./AddressTextField";
+import { PlaceData } from "@/data/mapBoxClient";
 
 const formSchema = z.object({
 	title: z.string(),
 	description: z.string(),
-	address: z.string(),
-	type: z.object({}).required(),
-	image: z.string(),
+	address: z.union([
+		z.string(),
+		z.object({
+			text: z.string(),
+			place_name: z.string(),
+			center: z.array(z.number()),
+		}),
+	]),
+	type: z.number(),
+	image: z.union([z.string(), z.instanceof(File)]),
 });
 
 export type TripFormData = z.infer<typeof formSchema>;
@@ -34,12 +45,21 @@ export type TripFormData = z.infer<typeof formSchema>;
 interface TripFormProps {
 	onSubmit: (values: TripFormData) => void;
 	defaultValues?: TripFormData;
+	isEditing?: boolean;
 }
 
 function TripForm(props: TripFormProps) {
-	const form = useForm<z.infer<typeof formSchema>>({
+	const form = useForm<TripFormData>({
 		resolver: zodResolver(formSchema),
 		defaultValues: props.defaultValues,
+	});
+
+	const tripTypesQuery = useQuery({
+		queryKey: ["tripTypes"],
+		queryFn: async () => {
+			const tripTypes = await apiClient.tripTypesApi.apiTripTypesGet();
+			return tripTypes.data;
+		},
 	});
 
 	return (
@@ -48,7 +68,9 @@ function TripForm(props: TripFormProps) {
 				onSubmit={form.handleSubmit(props.onSubmit)}
 				className="max-w-2xl w-full mx-auto"
 			>
-				<h1 className="text-3xl font-bold">Create a trip</h1>
+				<h1 className="text-3xl font-bold">
+					{props.isEditing ? "Edit" : "Create"} Trip
+				</h1>
 				<FormField
 					control={form.control}
 					name="title"
@@ -83,12 +105,16 @@ function TripForm(props: TripFormProps) {
 					control={form.control}
 					name="address"
 					render={({ field }) => (
-						<FormItem className="w-full mt-6">
+						<FormItem className="mt-4">
 							<FormLabel>Address</FormLabel>
-							<FormControl>
-								<Input placeholder="Enter an address" {...field} />
-							</FormControl>
-							<FormMessage />
+							<AddressTextField
+								defaultPlace={
+									props.defaultValues?.address instanceof Object
+										? (props.defaultValues.address as PlaceData)
+										: undefined
+								}
+								onPlaceChange={(place) => field.onChange(place)}
+							/>
 						</FormItem>
 					)}
 				/>
@@ -100,14 +126,27 @@ function TripForm(props: TripFormProps) {
 							<FormItem className="mt-4">
 								<FormLabel>Type</FormLabel>
 								<FormControl>
-									<Select onValueChange={(val) => field.onChange(val)}>
-										<SelectTrigger>
-											<SelectValue placeholder="Select a type of trip" />
+									<Select
+										onValueChange={(val) => field.onChange(+val)}
+										defaultValue={field.value?.toString()}
+									>
+										<SelectTrigger className="w-full">
+											<SelectValue placeholder="Select a type" />
 										</SelectTrigger>
 										<SelectContent>
-											<SelectItem value="light">Light</SelectItem>
-											<SelectItem value="dark">Dark</SelectItem>
-											<SelectItem value="system">System</SelectItem>
+											{tripTypesQuery.isLoading && (
+												<SelectItem value="loading" disabled>
+													Loading...
+												</SelectItem>
+											)}
+											{tripTypesQuery.data?.map((tripType) => (
+												<SelectItem
+													key={tripType.id}
+													value={tripType.id!.toString()}
+												>
+													{tripType.name}
+												</SelectItem>
+											))}
 										</SelectContent>
 									</Select>
 								</FormControl>
@@ -124,15 +163,28 @@ function TripForm(props: TripFormProps) {
 							<FormItem className="mt-4">
 								<FormLabel>Image</FormLabel>
 								<FormControl>
-									<Input type="file" {...field} placeholder="Select an image" />
+									<Input
+										type="file"
+										placeholder="Select an image"
+										accept="image/*"
+										onChange={(event) =>
+											field.onChange(
+												event.target.files && event.target.files[0]
+											)
+										}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						);
 					}}
 				/>
-				<Button type="submit" className="w-full mt-6">
-					Create Trip
+				<Button
+					type="submit"
+					className="w-full mt-6"
+					loading={form.formState.isSubmitting}
+				>
+					{props.isEditing ? "Edit" : "Create"} Trip
 				</Button>
 			</form>
 		</Form>

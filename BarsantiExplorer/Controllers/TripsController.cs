@@ -53,11 +53,16 @@ public class TripsController : BaseController
 
         if (queryParams.Latitude != null && queryParams.Longitude != null)
         {
-            var geoHashPrecision = queryParams.GeoHashPrecision ?? 3;
+            var geoHashPrecision = queryParams.GeoHashPrecision ?? 4;
             string geoHash =
                 _geoHasher.Encode(queryParams.Latitude.Value, queryParams.Longitude.Value, geoHashPrecision);
             var neighbours = _geoHasher.GetNeighbors(geoHash);
-            trips = trips.Where(el => neighbours.Values.Contains(el.GeoHash));
+
+            List<string> zoneHashes = neighbours.Values
+                .Concat(new List<string> { geoHash })
+                .ToList();
+
+            trips = trips.Where(el => zoneHashes.Contains(el.GeoHash.Substring(0, geoHashPrecision)));
         }
 
         if (queryParams.Sort != null)
@@ -94,6 +99,7 @@ public class TripsController : BaseController
     {
         var trip = DB.Trips
             .Include(el => el.TripType)
+            .Where(el => el.DeletedAt == null)
             .FirstOrDefault(el => el.Id == id);
 
         if (trip == null)
@@ -133,15 +139,17 @@ public class TripsController : BaseController
         }
 
         // calculate geo hash
-        var geoHash = _geoHasher.Encode(body.Latitude, body.Longitude, 6);
+        double latitude = double.Parse(body.Latitude.Replace(".", ","));
+        double longitude = double.Parse(body.Longitude.Replace(".", ","));
+        var geoHash = _geoHasher.Encode(latitude, longitude, 6);
 
         var trip = new Trip
         {
             Title = body.Title,
             Description = body.Description,
             Address = body.Address,
-            Latitude = body.Latitude,
-            Longitude = body.Longitude,
+            Latitude = latitude,
+            Longitude = longitude,
             TypeId = body.TypeId,
             Image = uniqueFileName,
             GeoHash = geoHash,
@@ -192,8 +200,8 @@ public class TripsController : BaseController
             trip.Image = uniqueFileName;
         }
 
-        if (body.Latitude != null) trip.Latitude = body.Latitude.Value;
-        if (body.Longitude != null) trip.Longitude = body.Longitude.Value;
+        if (body.Latitude != null) trip.Latitude = double.Parse(body.Latitude.Replace(".", ","));
+        if (body.Longitude != null) trip.Longitude = double.Parse(body.Longitude.Replace(".", ","));
         if (body.Title != null) trip.Title = body.Title;
         if (body.Description != null) trip.Description = body.Description;
         if (body.Address != null) trip.Address = body.Address;

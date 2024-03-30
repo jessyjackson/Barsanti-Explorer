@@ -12,7 +12,8 @@ namespace BarsantiExplorer.Controllers;
 public class TripTypesController : BaseController
 {
     public TripTypesController(BarsantiDbContext context, IConfiguration appSettings) : base(context, appSettings)
-    { }
+    {
+    }
 
     /// <summary>
     ///  Get filtered trip-types
@@ -23,12 +24,12 @@ public class TripTypesController : BaseController
     [ProducesResponseType(typeof(List<TripType>), StatusCodes.Status200OK)]
     public IActionResult GetTripTypes([FromQuery] GetTripTypesRequest queryParams)
     {
-        var tripTypes = DB.TripTypes.AsQueryable();
+        var tripTypes = DB.TripTypes.Where(el => el.DeletedAt == null);
 
         if (queryParams.Search != null)
         {
             tripTypes = tripTypes.Where(el =>
-                           el.Name.Contains(queryParams.Search));
+                el.Name.Contains(queryParams.Search));
         }
 
         if (queryParams.Sort != null)
@@ -36,10 +37,6 @@ public class TripTypesController : BaseController
             tripTypes = tripTypes.OrderBy(queryParams.Sort);
         }
 
-        if (tripTypes.ToList().Count == 0)
-        {
-            return NotFound();
-        }
         return Ok(tripTypes);
     }
 
@@ -54,12 +51,15 @@ public class TripTypesController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetTripType(int id)
     {
-        var tripType = DB.TripTypes.Find(id);
+        var tripType = DB.TripTypes
+            .Where(el => el.DeletedAt == null)
+            .FirstOrDefault(el => el.Id == id);
 
         if (tripType == null)
         {
             return NotFound();
         }
+
         return Ok(tripType);
     }
 }

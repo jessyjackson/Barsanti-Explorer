@@ -1,8 +1,6 @@
+import RefetchingIndicator from "@/components/RefetchingIndicator";
 import SearchBar from "@/components/SearchBar/SearchBar";
 import TripCard from "@/components/TripCard";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiClient from "@/data/apiClient";
 import { useQuery } from "@tanstack/react-query";
@@ -18,10 +16,10 @@ function LandingPage() {
 			const res = await apiClient.tripsApi.apiTripsGet(
 				undefined,
 				undefined,
-				"TotalRating",
+				"AverageRating",
 				"desc",
 				0,
-				5
+				3
 			);
 
 			return res.data;
@@ -57,7 +55,7 @@ function LandingPage() {
 				<SearchBar
 					onSearch={(place, category) => {
 						navigate("/trips", {
-							state: { place, category },
+							state: { place },
 						});
 					}}
 				/>
@@ -66,6 +64,7 @@ function LandingPage() {
 				<h2 className="text-3xl font-bold">Best Rated</h2>
 				{buildBestRatedTrips()}
 			</div>
+			<RefetchingIndicator isShown={bestRatedTripsQuery.isRefetching} />
 		</main>
 	);
 }

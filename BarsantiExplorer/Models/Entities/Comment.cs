@@ -8,8 +8,8 @@ namespace BarsantiExplorer.Models.Entities
 {
     public class Comment: BaseEntity
     {
-        [MaxLength(30)]
-        public string Title { get; set; }
+        [MaxLength(50)]
+        public string Author { get; set; }
         
         [MaxLength(150)]
         public string Text { get; set; }
@@ -23,8 +23,9 @@ namespace BarsantiExplorer.Models.Entities
         {
             return new CommentResponse
             {
-                Title = this.Title,
+                Author = this.Author,
                 Text = this.Text,
+                Rating = this.Rating
             };
         }
     }

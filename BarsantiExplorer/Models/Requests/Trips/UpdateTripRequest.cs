@@ -12,9 +12,9 @@ public class UpdateTripRequest
 
     public string? Address { get; set; }
 
-    public double? Latitude { get; set; }
+    public string? Latitude { get; set; }
 
-    public double? Longitude { get; set; }
+    public string? Longitude { get; set; }
 
     [Range(1, int.MaxValue)] public int? TypeId { get; set; }
 }

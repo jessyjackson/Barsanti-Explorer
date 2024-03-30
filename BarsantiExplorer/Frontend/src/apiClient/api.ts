@@ -26,6 +26,21 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AcceptCommentRequest
+ */
+export interface AcceptCommentRequest {
+    /**
+     * 
+     * @type {CommentStatus}
+     * @memberof AcceptCommentRequest
+     */
+    'status': CommentStatus;
+}
+
+
+/**
+ * 
+ * @export
  * @interface Comment
  */
 export interface Comment {
@@ -52,13 +67,25 @@ export interface Comment {
      * @type {string}
      * @memberof Comment
      */
-    'title'?: string | null;
+    'author'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Comment
      */
     'text'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Comment
+     */
+    'rating'?: number;
+    /**
+     * 
+     * @type {CommentStatus}
+     * @memberof Comment
+     */
+    'status'?: CommentStatus;
     /**
      * 
      * @type {number}
@@ -71,6 +98,123 @@ export interface Comment {
      * @memberof Comment
      */
     'trip'?: Trip;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface CommentResponse
+ */
+export interface CommentResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CommentResponse
+     */
+    'author'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CommentResponse
+     */
+    'text'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommentResponse
+     */
+    'rating'?: number;
+    /**
+     * 
+     * @type {Trip}
+     * @memberof CommentResponse
+     */
+    'trip'?: Trip;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const CommentStatus = {
+    NUMBER_0: 0,
+    NUMBER_1: 1,
+    NUMBER_2: 2
+} as const;
+
+export type CommentStatus = typeof CommentStatus[keyof typeof CommentStatus];
+
+
+/**
+ * 
+ * @export
+ * @interface CreateCommentRequest
+ */
+export interface CreateCommentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCommentRequest
+     */
+    'author': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCommentRequest
+     */
+    'text': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateCommentRequest
+     */
+    'rating': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateCommentRequest
+     */
+    'tripId'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface LoginRequest
+ */
+export interface LoginRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    'email': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    'password': string;
+}
+/**
+ * 
+ * @export
+ * @interface LoginResponse
+ */
+export interface LoginResponse {
+    /**
+     * 
+     * @type {UserResponse}
+     * @memberof LoginResponse
+     */
+    'user'?: UserResponse;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    'token'?: string | null;
 }
 /**
  * 
@@ -182,6 +326,24 @@ export interface Trip {
      * @type {number}
      * @memberof Trip
      */
+    'ratingsNumber'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Trip
+     */
+    'totalRating'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Trip
+     */
+    'averageRating'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Trip
+     */
     'typeId'?: number;
     /**
      * 
@@ -189,6 +351,12 @@ export interface Trip {
      * @memberof Trip
      */
     'tripType'?: TripType;
+    /**
+     * 
+     * @type {Array<Comment>}
+     * @memberof Trip
+     */
+    'comments'?: Array<Comment> | null;
 }
 /**
  * 
@@ -262,6 +430,12 @@ export interface TripResponse {
      * @memberof TripResponse
      */
     'tripType'?: TripType;
+    /**
+     * 
+     * @type {number}
+     * @memberof TripResponse
+     */
+    'averageRating'?: number;
 }
 /**
  * 
@@ -294,6 +468,230 @@ export interface TripType {
      */
     'name'?: string | null;
 }
+/**
+ * 
+ * @export
+ * @interface TripTypeResponse
+ */
+export interface TripTypeResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof TripTypeResponse
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof TripTypeResponse
+     */
+    'name'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface UserResponse
+ */
+export interface UserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
+    'email'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserResponse
+     */
+    'telegramId'?: number | null;
+}
+
+/**
+ * AuthApi - axios parameter creator
+ * @export
+ */
+export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {LoginRequest} [loginRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authLoginPost: async (loginRequest?: LoginRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(loginRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get current user
+         * @param {string} [authorization] The authorization header built into the HTTP request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authMeGet: async (authorization?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/me`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (authorization != null) {
+                localVarHeaderParameter['Authorization'] = String(authorization);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AuthApi - functional programming interface
+ * @export
+ */
+export const AuthApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {LoginRequest} [loginRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authLoginPost(loginRequest?: LoginRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LoginResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authLoginPost(loginRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.authLoginPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get current user
+         * @param {string} [authorization] The authorization header built into the HTTP request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authMeGet(authorization?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authMeGet(authorization, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.authMeGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AuthApi - factory interface
+ * @export
+ */
+export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AuthApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Login
+         * @param {LoginRequest} [loginRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authLoginPost(loginRequest?: LoginRequest, options?: any): AxiosPromise<LoginResponse> {
+            return localVarFp.authLoginPost(loginRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get current user
+         * @param {string} [authorization] The authorization header built into the HTTP request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authMeGet(authorization?: string, options?: any): AxiosPromise<UserResponse> {
+            return localVarFp.authMeGet(authorization, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AuthApi - object-oriented interface
+ * @export
+ * @class AuthApi
+ * @extends {BaseAPI}
+ */
+export class AuthApi extends BaseAPI {
+    /**
+     * 
+     * @summary Login
+     * @param {LoginRequest} [loginRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authLoginPost(loginRequest?: LoginRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authLoginPost(loginRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get current user
+     * @param {string} [authorization] The authorization header built into the HTTP request
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authMeGet(authorization?: string, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authMeGet(authorization, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
 
 /**
  * CommentsApi - axios parameter creator
@@ -304,12 +702,13 @@ export const CommentsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * 
          * @summary Get filtered comments
-         * @param {string} [tripTitle] 
-         * @param {string} [sort] 
+         * @param {number} [tripId] 
+         * @param {number} [page] 
+         * @param {number} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommentsGet: async (tripTitle?: string, sort?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCommentsGet: async (tripId?: number, page?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/comments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -322,12 +721,20 @@ export const CommentsApiAxiosParamCreator = function (configuration?: Configurat
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (tripTitle !== undefined) {
-                localVarQueryParameter['TripTitle'] = tripTitle;
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (tripId !== undefined) {
+                localVarQueryParameter['TripId'] = tripId;
             }
 
-            if (sort !== undefined) {
-                localVarQueryParameter['Sort'] = sort;
+            if (page !== undefined) {
+                localVarQueryParameter['Page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['Limit'] = limit;
             }
 
 
@@ -364,6 +771,10 @@ export const CommentsApiAxiosParamCreator = function (configuration?: Configurat
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -398,11 +809,94 @@ export const CommentsApiAxiosParamCreator = function (configuration?: Configurat
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {AcceptCommentRequest} [acceptCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCommentsIdPost: async (id: number, acceptCommentRequest?: AcceptCommentRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiCommentsIdPost', 'id', id)
+            const localVarPath = `/api/comments/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(acceptCommentRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create a new comment
+         * @param {CreateCommentRequest} [createCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCommentsPost: async (createCommentRequest?: CreateCommentRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/comments`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createCommentRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -422,13 +916,14 @@ export const CommentsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get filtered comments
-         * @param {string} [tripTitle] 
-         * @param {string} [sort] 
+         * @param {number} [tripId] 
+         * @param {number} [page] 
+         * @param {number} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommentsGet(tripTitle?: string, sort?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Comment>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCommentsGet(tripTitle, sort, options);
+        async apiCommentsGet(tripId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Comment>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCommentsGet(tripId, page, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentsApi.apiCommentsGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -453,10 +948,36 @@ export const CommentsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommentsIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripResponse>> {
+        async apiCommentsIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiCommentsIdGet(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentsApi.apiCommentsIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {AcceptCommentRequest} [acceptCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCommentsIdPost(id: number, acceptCommentRequest?: AcceptCommentRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCommentsIdPost(id, acceptCommentRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentsApi.apiCommentsIdPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Create a new comment
+         * @param {CreateCommentRequest} [createCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCommentsPost(createCommentRequest?: CreateCommentRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCommentsPost(createCommentRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentsApi.apiCommentsPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -472,13 +993,14 @@ export const CommentsApiFactory = function (configuration?: Configuration, baseP
         /**
          * 
          * @summary Get filtered comments
-         * @param {string} [tripTitle] 
-         * @param {string} [sort] 
+         * @param {number} [tripId] 
+         * @param {number} [page] 
+         * @param {number} [limit] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommentsGet(tripTitle?: string, sort?: string, options?: any): AxiosPromise<Array<Comment>> {
-            return localVarFp.apiCommentsGet(tripTitle, sort, options).then((request) => request(axios, basePath));
+        apiCommentsGet(tripId?: number, page?: number, limit?: number, options?: any): AxiosPromise<Array<Comment>> {
+            return localVarFp.apiCommentsGet(tripId, page, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -497,8 +1019,28 @@ export const CommentsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommentsIdGet(id: number, options?: any): AxiosPromise<TripResponse> {
+        apiCommentsIdGet(id: number, options?: any): AxiosPromise<CommentResponse> {
             return localVarFp.apiCommentsIdGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {AcceptCommentRequest} [acceptCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCommentsIdPost(id: number, acceptCommentRequest?: AcceptCommentRequest, options?: any): AxiosPromise<CommentResponse> {
+            return localVarFp.apiCommentsIdPost(id, acceptCommentRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create a new comment
+         * @param {CreateCommentRequest} [createCommentRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCommentsPost(createCommentRequest?: CreateCommentRequest, options?: any): AxiosPromise<CommentResponse> {
+            return localVarFp.apiCommentsPost(createCommentRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -513,14 +1055,15 @@ export class CommentsApi extends BaseAPI {
     /**
      * 
      * @summary Get filtered comments
-     * @param {string} [tripTitle] 
-     * @param {string} [sort] 
+     * @param {number} [tripId] 
+     * @param {number} [page] 
+     * @param {number} [limit] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CommentsApi
      */
-    public apiCommentsGet(tripTitle?: string, sort?: string, options?: RawAxiosRequestConfig) {
-        return CommentsApiFp(this.configuration).apiCommentsGet(tripTitle, sort, options).then((request) => request(this.axios, this.basePath));
+    public apiCommentsGet(tripId?: number, page?: number, limit?: number, options?: RawAxiosRequestConfig) {
+        return CommentsApiFp(this.configuration).apiCommentsGet(tripId, page, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -545,6 +1088,224 @@ export class CommentsApi extends BaseAPI {
      */
     public apiCommentsIdGet(id: number, options?: RawAxiosRequestConfig) {
         return CommentsApiFp(this.configuration).apiCommentsIdGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {AcceptCommentRequest} [acceptCommentRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentsApi
+     */
+    public apiCommentsIdPost(id: number, acceptCommentRequest?: AcceptCommentRequest, options?: RawAxiosRequestConfig) {
+        return CommentsApiFp(this.configuration).apiCommentsIdPost(id, acceptCommentRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create a new comment
+     * @param {CreateCommentRequest} [createCommentRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentsApi
+     */
+    public apiCommentsPost(createCommentRequest?: CreateCommentRequest, options?: RawAxiosRequestConfig) {
+        return CommentsApiFp(this.configuration).apiCommentsPost(createCommentRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * TripTypesApi - axios parameter creator
+ * @export
+ */
+export const TripTypesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get filtered trip-types
+         * @param {string} [search] 
+         * @param {string} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesGet: async (search?: string, sort?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/trip-types`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (search !== undefined) {
+                localVarQueryParameter['Search'] = search;
+            }
+
+            if (sort !== undefined) {
+                localVarQueryParameter['Sort'] = sort;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get a trip-type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesIdGet: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiTripTypesIdGet', 'id', id)
+            const localVarPath = `/api/trip-types/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * TripTypesApi - functional programming interface
+ * @export
+ */
+export const TripTypesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = TripTypesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get filtered trip-types
+         * @param {string} [search] 
+         * @param {string} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiTripTypesGet(search?: string, sort?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TripType>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripTypesGet(search, sort, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TripTypesApi.apiTripTypesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get a trip-type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiTripTypesIdGet(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripTypeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripTypesIdGet(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TripTypesApi.apiTripTypesIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * TripTypesApi - factory interface
+ * @export
+ */
+export const TripTypesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = TripTypesApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get filtered trip-types
+         * @param {string} [search] 
+         * @param {string} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesGet(search?: string, sort?: string, options?: any): AxiosPromise<Array<TripType>> {
+            return localVarFp.apiTripTypesGet(search, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get a trip-type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesIdGet(id: number, options?: any): AxiosPromise<TripTypeResponse> {
+            return localVarFp.apiTripTypesIdGet(id, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * TripTypesApi - object-oriented interface
+ * @export
+ * @class TripTypesApi
+ * @extends {BaseAPI}
+ */
+export class TripTypesApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get filtered trip-types
+     * @param {string} [search] 
+     * @param {string} [sort] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TripTypesApi
+     */
+    public apiTripTypesGet(search?: string, sort?: string, options?: RawAxiosRequestConfig) {
+        return TripTypesApiFp(this.configuration).apiTripTypesGet(search, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a trip-type
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TripTypesApi
+     */
+    public apiTripTypesIdGet(id: number, options?: RawAxiosRequestConfig) {
+        return TripTypesApiFp(this.configuration).apiTripTypesIdGet(id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -584,6 +1345,10 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             if (tripType !== undefined) {
                 localVarQueryParameter['TripType'] = tripType;
@@ -659,6 +1424,10 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -693,6 +1462,10 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -712,13 +1485,13 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} [title] 
          * @param {string} [description] 
          * @param {string} [address] 
-         * @param {number} [latitude] 
-         * @param {number} [longitude] 
+         * @param {string} [latitude] 
+         * @param {string} [longitude] 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTripsIdPut: async (id: number, image?: File, title?: string, description?: string, address?: string, latitude?: number, longitude?: number, typeId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiTripsIdPut: async (id: number, image?: File, title?: string, description?: string, address?: string, latitude?: string, longitude?: string, typeId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('apiTripsIdPut', 'id', id)
             const localVarPath = `/api/trips/{id}`
@@ -734,6 +1507,10 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
             const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
             if (image !== undefined) { 
@@ -784,13 +1561,13 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} title 
          * @param {string} description 
          * @param {string} address 
-         * @param {number} latitude 
-         * @param {number} longitude 
+         * @param {string} latitude 
+         * @param {string} longitude 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTripsPost: async (image: File, title: string, description: string, address: string, latitude: number, longitude: number, typeId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiTripsPost: async (image: File, title: string, description: string, address: string, latitude: string, longitude: string, typeId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'image' is not null or undefined
             assertParamExists('apiTripsPost', 'image', image)
             // verify required parameter 'title' is not null or undefined
@@ -815,6 +1592,10 @@ export const TripsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
             const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
             if (image !== undefined) { 
@@ -924,13 +1705,13 @@ export const TripsApiFp = function(configuration?: Configuration) {
          * @param {string} [title] 
          * @param {string} [description] 
          * @param {string} [address] 
-         * @param {number} [latitude] 
-         * @param {number} [longitude] 
+         * @param {string} [latitude] 
+         * @param {string} [longitude] 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: number, longitude?: number, typeId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripResponse>> {
+        async apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: string, longitude?: string, typeId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripsIdPut(id, image, title, description, address, latitude, longitude, typeId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TripsApi.apiTripsIdPut']?.[localVarOperationServerIndex]?.url;
@@ -943,13 +1724,13 @@ export const TripsApiFp = function(configuration?: Configuration) {
          * @param {string} title 
          * @param {string} description 
          * @param {string} address 
-         * @param {number} latitude 
-         * @param {number} longitude 
+         * @param {string} latitude 
+         * @param {string} longitude 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiTripsPost(image: File, title: string, description: string, address: string, latitude: number, longitude: number, typeId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripResponse>> {
+        async apiTripsPost(image: File, title: string, description: string, address: string, latitude: string, longitude: string, typeId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripsPost(image, title, description, address, latitude, longitude, typeId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TripsApi.apiTripsPost']?.[localVarOperationServerIndex]?.url;
@@ -1012,13 +1793,13 @@ export const TripsApiFactory = function (configuration?: Configuration, basePath
          * @param {string} [title] 
          * @param {string} [description] 
          * @param {string} [address] 
-         * @param {number} [latitude] 
-         * @param {number} [longitude] 
+         * @param {string} [latitude] 
+         * @param {string} [longitude] 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: number, longitude?: number, typeId?: number, options?: any): AxiosPromise<TripResponse> {
+        apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: string, longitude?: string, typeId?: number, options?: any): AxiosPromise<TripResponse> {
             return localVarFp.apiTripsIdPut(id, image, title, description, address, latitude, longitude, typeId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1028,13 +1809,13 @@ export const TripsApiFactory = function (configuration?: Configuration, basePath
          * @param {string} title 
          * @param {string} description 
          * @param {string} address 
-         * @param {number} latitude 
-         * @param {number} longitude 
+         * @param {string} latitude 
+         * @param {string} longitude 
          * @param {number} [typeId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTripsPost(image: File, title: string, description: string, address: string, latitude: number, longitude: number, typeId?: number, options?: any): AxiosPromise<TripResponse> {
+        apiTripsPost(image: File, title: string, description: string, address: string, latitude: string, longitude: string, typeId?: number, options?: any): AxiosPromise<TripResponse> {
             return localVarFp.apiTripsPost(image, title, description, address, latitude, longitude, typeId, options).then((request) => request(axios, basePath));
         },
     };
@@ -1100,14 +1881,14 @@ export class TripsApi extends BaseAPI {
      * @param {string} [title] 
      * @param {string} [description] 
      * @param {string} [address] 
-     * @param {number} [latitude] 
-     * @param {number} [longitude] 
+     * @param {string} [latitude] 
+     * @param {string} [longitude] 
      * @param {number} [typeId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TripsApi
      */
-    public apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: number, longitude?: number, typeId?: number, options?: RawAxiosRequestConfig) {
+    public apiTripsIdPut(id: number, image?: File, title?: string, description?: string, address?: string, latitude?: string, longitude?: string, typeId?: number, options?: RawAxiosRequestConfig) {
         return TripsApiFp(this.configuration).apiTripsIdPut(id, image, title, description, address, latitude, longitude, typeId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1118,14 +1899,14 @@ export class TripsApi extends BaseAPI {
      * @param {string} title 
      * @param {string} description 
      * @param {string} address 
-     * @param {number} latitude 
-     * @param {number} longitude 
+     * @param {string} latitude 
+     * @param {string} longitude 
      * @param {number} [typeId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TripsApi
      */
-    public apiTripsPost(image: File, title: string, description: string, address: string, latitude: number, longitude: number, typeId?: number, options?: RawAxiosRequestConfig) {
+    public apiTripsPost(image: File, title: string, description: string, address: string, latitude: string, longitude: string, typeId?: number, options?: RawAxiosRequestConfig) {
         return TripsApiFp(this.configuration).apiTripsPost(image, title, description, address, latitude, longitude, typeId, options).then((request) => request(this.axios, this.basePath));
     }
 }

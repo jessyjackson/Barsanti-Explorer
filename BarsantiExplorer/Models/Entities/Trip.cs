@@ -50,7 +50,7 @@ public class Trip : BaseEntity
             TripType = this.TripType,
             CreatedAt = this.CreatedAt,
             DeletedAt = this.DeletedAt,
-            AvarageRating = this.AverageRating
+            AverageRating = this.AverageRating
         };
     }
 }
