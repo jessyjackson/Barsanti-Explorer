@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { LiaTelegramPlane } from "react-icons/lia";
 import { FiEdit } from "react-icons/fi";

@@ -1,10 +1,8 @@
 import SearchBar from "@/components/SearchBar/SearchBar";
 import TripCard from "@/components/TripCard";
-import { Card } from "@/components/ui/card";
 import {
 	Pagination,
 	PaginationContent,
-	PaginationEllipsis,
 	PaginationItem,
 	PaginationLink,
 	PaginationNext,

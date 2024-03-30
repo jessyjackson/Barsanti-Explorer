@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthStore } from "@/store/authStore";
-import React from "react";
 import { IoSaveOutline } from "react-icons/io5";
 
 function SyncTelegramPage() {

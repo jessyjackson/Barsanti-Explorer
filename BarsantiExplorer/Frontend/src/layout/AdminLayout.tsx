@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/authStore";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Outlet, useNavigate } from "react-router-dom";
 

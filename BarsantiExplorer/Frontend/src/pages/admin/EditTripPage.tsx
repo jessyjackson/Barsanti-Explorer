@@ -2,7 +2,7 @@ import TripForm, { TripFormData } from "@/components/TripForm";
 import { useToast } from "@/components/ui/use-toast";
 import apiClient from "@/data/apiClient";
 import mapBoxClient from "@/data/mapBoxClient";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
 function EditTripPage() {
@@ -10,7 +10,6 @@ function EditTripPage() {
 	const { id } = params;
 	const navigate = useNavigate();
 	const { toast } = useToast();
-	const queryClient = useQueryClient();
 
 	const tripDetailsQuery = useQuery({
 		queryKey: ["trip", id],

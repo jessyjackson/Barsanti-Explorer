@@ -4,7 +4,7 @@ import TripCard from "@/components/TripCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiClient from "@/data/apiClient";
 import { useQuery } from "@tanstack/react-query";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
@@ -53,7 +53,7 @@ function LandingPage() {
 			</h1>
 			<div className="max-w-3xl mx-auto mt-10">
 				<SearchBar
-					onSearch={(place, category) => {
+					onSearch={(place) => {
 						navigate("/trips", {
 							state: { place },
 						});
