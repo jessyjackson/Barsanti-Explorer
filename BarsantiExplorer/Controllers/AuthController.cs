@@ -1,5 +1,4 @@
 using BarsantiExplorer.Models;
-using BarsantiExplorer.Models.Entities;
 using BarsantiExplorer.Models.Requests.Auth;
 using BarsantiExplorer.Models.Responses;
 using BarsantiExplorer.Services;
@@ -7,11 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
 
 
 namespace BarsantiExplorer.Controllers;

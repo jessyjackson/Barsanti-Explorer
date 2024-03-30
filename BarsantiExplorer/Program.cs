@@ -11,19 +11,22 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
 
+//telegram bot
+Bot telegramBot = new(
+    builder.Configuration["BotApiToken"]
+);
+builder.Services.AddHostedService(serviceProvider => telegramBot);
+
 // Add services to the container.
 builder.Services.AddControllers();
 
 // learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(SetupSwaggerDocumentation);
+builder.Services.AddScoped<Bot>(_ => telegramBot);
 builder.Services.AddMvc();
 
-//telegram bot
-Bot telegramBot = new(
-    builder.Configuration["BotApiToken"]
-);
-builder.Services.AddHostedService(serviceProvider => telegramBot);
+
 
 //auth
 var jwtOptions = builder.Configuration

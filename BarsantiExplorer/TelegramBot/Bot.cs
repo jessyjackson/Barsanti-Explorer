@@ -1,46 +1,65 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Args;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
 using BarsantiExplorer.Models;
+using BarsantiExplorer.Models.Entities;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BarsantiExplorer.TelegramBot
 {
-    public class Bot : IHostedService
+    public class Bot : BackgroundService
     {
         private TelegramBotClient BotClient;
         public Bot(string bot_api)
         {
             BotClient = new TelegramBotClient(bot_api);
         }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async void DoWork(BarsantiDbContext db,Comment comment)
         {
-            using var cts = new CancellationTokenSource();
+            var users = db.Users
+                .Select(el => el.TelegramId)
+                .ToList();
 
-            var receiverOptions = new ReceiverOptions
+            var inlineKeyboardMarkup = new InlineKeyboardMarkup(new[]
             {
-                AllowedUpdates = Array.Empty<UpdateType>() 
-            };
-
-            BotClient.StartReceiving(
-                updateHandler: HandleUpdateAsync,
-                pollingErrorHandler: HandlePollingErrorAsync,
-                receiverOptions: receiverOptions,
-                cancellationToken: cts.Token
-            );
-
-            Console.WriteLine("Bot started" + BotClient.GetMeAsync());
-            Console.WriteLine("API: " + BotClient.LocalBotServer);
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("Accept"),
+                    InlineKeyboardButton.WithCallbackData("Deny")
+                }
+            });
+            foreach (var user in users)
+            {
+               await BotClient.SendTextMessageAsync(
+                    chatId: user,
+                    text: "Hello! I am a bot that can echo back your messages. Just type anything and I will send it back to you!",
+                    replyMarkup: inlineKeyboardMarkup
+                );
+            }
         }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public async void OnCallBack(object sender,CallbackQuery e)
         {
-            Console.WriteLine("Bot stopped");
+            var message = e.Message;
+            var callbackData = e.Data;
+            Console.WriteLine($"Received callback data {callbackData} in chat {message.Chat.Id}.");
+            
         }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            //callback handling
+            if (update.CallbackQuery != null)
+            {
+                Console.WriteLine("Received callback data " + update.CallbackQuery.Data);
+            }
+
+
+
+
+
+            //message handling
             if (update.Message is not { } message)
             {
                 return;
@@ -50,28 +69,26 @@ namespace BarsantiExplorer.TelegramBot
             {
                 return;
             }
-            if (messageText == "test") { 
-                Console.WriteLine(message);
-                await SendTextMessageAsync(botClient, message,Convert.ToString(message.Chat.Id), cancellationToken);
-            }
-            else
+
+            if (messageText == "/help")
             {
-                await SendTextMessageAsync(botClient, message, "you have said: \n" + messageText, cancellationToken);
+                await botClient.SendTextMessageAsync(
+                    chatId: message.Chat,
+                    text: "I am a bot that can echo back your messages. Just type anything and I will send it back to you!",
+                    cancellationToken: cancellationToken
+                    );
+            }
+            else if(messageText == "/id")
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId: message.Chat,
+                    text: message.Chat.Id.ToString(),
+                    cancellationToken: cancellationToken
+                );
             }
 
             Console.WriteLine($"Received a '{messageText}' message in chat {message.Chat.Id}.");
         }
-        public async Task SendTextMessageAsync(ITelegramBotClient botClient, Message message,string reply,CancellationToken cancellationToken)
-        {
-            
-            await BotClient.SendTextMessageAsync(chatId:message.Chat,text: reply);
-        }
-        public async void BroadcastComment()
-        {
-            //BotClient.SendTextMessageAsync(chatId: 5822417084, text: "Hello World");
-        } 
-
-
         //Error handling
         private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
@@ -83,6 +100,25 @@ namespace BarsantiExplorer.TelegramBot
             };
 
             Console.WriteLine(ErrorMessage);
+            return Task.CompletedTask;
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            using var cts = new CancellationTokenSource();
+
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = Array.Empty<UpdateType>()
+            };
+            BotClient.StartReceiving(
+                updateHandler: HandleUpdateAsync,
+                pollingErrorHandler: HandlePollingErrorAsync,
+                receiverOptions: receiverOptions,
+                cancellationToken: cts.Token
+            );
+
+            Console.WriteLine("Bot started" + BotClient.GetMeAsync());
             return Task.CompletedTask;
         }
 

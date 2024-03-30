@@ -13,8 +13,8 @@ namespace BarsantiExplorer.Models.Entities
         [MaxLength(64)]
         [Required]
         public string Password { get; set; }
-        
-        public int? TelegramId { get; set; }
+
+        public long TelegramId { get; set; }
         
         public UserResponse MapToUserResponse()
         {

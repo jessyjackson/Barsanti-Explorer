@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using BarsantiExplorer.Enum;
+using BarsantiExplorer.TelegramBot;
 
 namespace BarsantiExplorer.Controllers;
 
@@ -16,7 +17,7 @@ namespace BarsantiExplorer.Controllers;
 [Route("api/comments")]
 public class CommentsController : BaseController
 {
-    public CommentsController(BarsantiDbContext context, IConfiguration appSettings) : base(context, appSettings)
+    public CommentsController(BarsantiDbContext context, IConfiguration appSettings,Bot telegramBot) : base(context, appSettings,telegramBot)
     {
     }
 
@@ -44,7 +45,7 @@ public class CommentsController : BaseController
                 .Skip(queryParams.Page.Value * queryParams.Limit.Value)
                 .Take(queryParams.Limit.Value);
         }
-
+        
         return Ok(comments);
     }
 
@@ -68,7 +69,7 @@ public class CommentsController : BaseController
         {
             return NotFound();
         }
-
+        TelegramBot.DoWork(DB,comment);
         return Ok(comment.MapToCommentResponse());
     }
 
