@@ -244,6 +244,7 @@ function TripDetailsPage() {
 							setRatingDialogOpen(true);
 							setGivenRating(0);
 							setAuthor("");
+							setReviewText("");
 						}}
 					>
 						Rate Trip

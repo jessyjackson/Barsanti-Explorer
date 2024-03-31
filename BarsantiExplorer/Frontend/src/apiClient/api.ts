@@ -258,6 +258,32 @@ export interface ProblemDetails {
 /**
  * 
  * @export
+ * @interface TelegramSetIdRequest
+ */
+export interface TelegramSetIdRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof TelegramSetIdRequest
+     */
+    'telegramId'?: number | null;
+}
+/**
+ * 
+ * @export
+ * @interface TelegramSetIdResponse
+ */
+export interface TelegramSetIdResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TelegramSetIdResponse
+     */
+    'success'?: boolean;
+}
+/**
+ * 
+ * @export
  * @interface Trip
  */
 export interface Trip {
@@ -554,11 +580,10 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * 
          * @summary Get current user
-         * @param {string} [authorization] The authorization header built into the HTTP request
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authMeGet: async (authorization?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        authMeGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/auth/me`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -575,15 +600,49 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (authorization != null) {
-                localVarHeaderParameter['Authorization'] = String(authorization);
-            }
-
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Set user telegram id
+         * @param {TelegramSetIdRequest} [telegramSetIdRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authTelegramPost: async (telegramSetIdRequest?: TelegramSetIdRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/telegram`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(telegramSetIdRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -616,14 +675,26 @@ export const AuthApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get current user
-         * @param {string} [authorization] The authorization header built into the HTTP request
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authMeGet(authorization?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authMeGet(authorization, options);
+        async authMeGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authMeGet(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.authMeGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Set user telegram id
+         * @param {TelegramSetIdRequest} [telegramSetIdRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authTelegramPost(telegramSetIdRequest?: TelegramSetIdRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TelegramSetIdResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authTelegramPost(telegramSetIdRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.authTelegramPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -649,12 +720,21 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
         /**
          * 
          * @summary Get current user
-         * @param {string} [authorization] The authorization header built into the HTTP request
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authMeGet(authorization?: string, options?: any): AxiosPromise<UserResponse> {
-            return localVarFp.authMeGet(authorization, options).then((request) => request(axios, basePath));
+        authMeGet(options?: any): AxiosPromise<UserResponse> {
+            return localVarFp.authMeGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set user telegram id
+         * @param {TelegramSetIdRequest} [telegramSetIdRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authTelegramPost(telegramSetIdRequest?: TelegramSetIdRequest, options?: any): AxiosPromise<TelegramSetIdResponse> {
+            return localVarFp.authTelegramPost(telegramSetIdRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -681,13 +761,24 @@ export class AuthApi extends BaseAPI {
     /**
      * 
      * @summary Get current user
-     * @param {string} [authorization] The authorization header built into the HTTP request
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public authMeGet(authorization?: string, options?: RawAxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authMeGet(authorization, options).then((request) => request(this.axios, this.basePath));
+    public authMeGet(options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authMeGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set user telegram id
+     * @param {TelegramSetIdRequest} [telegramSetIdRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authTelegramPost(telegramSetIdRequest?: TelegramSetIdRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authTelegramPost(telegramSetIdRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

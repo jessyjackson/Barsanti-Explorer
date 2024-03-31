@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BarsantiExplorer.Models.Requests;
 
 
 namespace BarsantiExplorer.Controllers;
@@ -75,20 +76,15 @@ public class AuthController : BaseController
     /// <summary>
     /// Get current user
     /// </summary>
-    /// <param name="authorization">The authorization header built into the HTTP request</param>
     /// <response code="200">Returns the current user</response>
     /// <response code="401">If the user is not authenticated</response>
     [ProducesResponseType(typeof(UserResponse), 200)]
     [ProducesResponseType(401)]
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me([FromHeader(Name = "Authorization")] string authorization)
+    public IActionResult Me()
     {
-        string oldToken = authorization.Split(' ')[1];
-        JwtSecurityTokenHandler handler = new();
-        JwtSecurityToken jwtSecurityToken = handler.ReadJwtToken(oldToken);
-        string? email = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value;
-
+        string? email = User.FindFirstValue(ClaimTypes.Email);
         if (email == null)
         {
             return Unauthorized();
@@ -101,5 +97,37 @@ public class AuthController : BaseController
         }
 
         return Ok(user.MapToUserResponse());
+    }
+
+    /// <summary>
+    /// Set user telegram id
+    /// </summary>
+    /// <response code="200">Returns the current user</response>
+    /// <response code="401">If the user is not authenticated</response>
+    [ProducesResponseType(typeof(TelegramSetIdResponse), 200)]
+    [ProducesResponseType(401)]
+    [Authorize]
+    [HttpPost("telegram")]
+    public IActionResult SetTelegramId([FromBody] TelegramSetIdRequest body)
+    {
+        string? email = User.FindFirstValue(ClaimTypes.Email);
+        if (email == null)
+        {
+            return Unauthorized();
+        }
+
+        var user = DB.Users.FirstOrDefault(u => u.Email == email);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        user.TelegramId = body.TelegramId;
+        DB.SaveChanges();
+
+        return Ok(new TelegramSetIdResponse()
+        {
+            Success = true
+        });
     }
 }

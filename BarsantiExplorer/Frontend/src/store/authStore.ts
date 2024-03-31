@@ -28,6 +28,10 @@ interface AuthStore {
 	 * Logout the user and remove the tokens from the localstorage
 	 */
 	logout: () => Promise<void>;
+	/**
+	 * Save the telegram id of the user
+	 */
+	setTelegramId: (telegramId: number) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -80,5 +84,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
 		set({ user: null, isLogging: false, isUserLoading: false });
+	},
+	setTelegramId: async (telegramId: number) => {
+		const res = await apiClient.authApi.authTelegramPost({
+			telegramId: telegramId,
+		});
+		if (!res.data.success) throw new Error("Failed to save telegram id");
+
+		set({
+			user: {
+				telegramId: telegramId,
+			},
+		});
 	},
 }));

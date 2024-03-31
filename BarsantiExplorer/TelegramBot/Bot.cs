@@ -18,24 +18,26 @@ namespace BarsantiExplorer.TelegramBot
     {
         private TelegramBotClient BotClient;
         private BarsantiDbContext DB;
-        private Dictionary<int,Dictionary<long,int>> MessagesStatus = new();
+        private Dictionary<int, Dictionary<long, int>> MessagesStatus = new();
         private string Accept = "Accept";
         private string Reject = "Reject";
-        public Bot(string bot_api,string connectionString)
+
+        public Bot(string bot_api, string connectionString)
         {
             BotClient = new TelegramBotClient(bot_api);
-            var contextOptions = new DbContextOptionsBuilder<BarsantiDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            var contextOptions =
+                new DbContextOptionsBuilder<BarsantiDbContext>().UseMySql(connectionString,
+                    ServerVersion.AutoDetect(connectionString));
             DB = new BarsantiDbContext(contextOptions.Options);
         }
-        public List<long> GetUsers()
-        {
-            return DB.Users
-                .Select(el => el.TelegramId)
-                .ToList();
-        }
+
         public async void DoWork(Comment comment)
         {
-            var users = GetUsers();
+            var telegramIds = DB.Users
+                .Where(el => el.TelegramId != null)
+                .Select(el => el.TelegramId!.Value)
+                .ToList();
+
             if (MessagesStatus.ContainsKey(comment.Id))
             {
                 MessagesStatus[comment.Id].Clear();
@@ -44,6 +46,7 @@ namespace BarsantiExplorer.TelegramBot
             {
                 MessagesStatus.Add(comment.Id, new Dictionary<long, int>());
             }
+
             var inlineKeyboardMarkup = new InlineKeyboardMarkup(new[]
             {
                 new[]
@@ -54,18 +57,26 @@ namespace BarsantiExplorer.TelegramBot
             });
 
             string text = comment.Id + "\n" + comment.Author + " want to add this comment: \n" + comment.Text;
-            foreach (var user in users)
+            foreach (var id in telegramIds)
             {
-                var tmp = await BotClient.SendTextMessageAsync(
-                    chatId: user,
-                    text: text,
-                    replyMarkup: inlineKeyboardMarkup
-                );
-                MessagesStatus[comment.Id].Add(user, tmp.MessageId);
+                try
+                {
+                    var tmp = await BotClient.SendTextMessageAsync(
+                        chatId: id,
+                        text: text,
+                        replyMarkup: inlineKeyboardMarkup
+                    );
+                    MessagesStatus[comment.Id].Add(id, tmp.MessageId);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
-
         }
-        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+
+        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+            CancellationToken cancellationToken)
         {
             //callback handling
             if (update.CallbackQuery != null)
@@ -82,8 +93,9 @@ namespace BarsantiExplorer.TelegramBot
                 {
                     DB.Comments.Find(commentId).Status = CommentStatus.Rejected;
                 }
+
                 DB.SaveChanges();
-                foreach(var dict in MessagesStatus[commentId])
+                foreach (var dict in MessagesStatus[commentId])
                 {
                     if (dict.Key == userId)
                     {
@@ -103,8 +115,8 @@ namespace BarsantiExplorer.TelegramBot
                             cancellationToken: cancellationToken
                         );
                     }
-
                 }
+
                 MessagesStatus.Remove(commentId);
                 return;
             }
@@ -120,23 +132,26 @@ namespace BarsantiExplorer.TelegramBot
                 return;
             }
 
-            if(messageText == "/id")
+            if (messageText == "/id")
             {
                 await botClient.SendTextMessageAsync(
                     chatId: message.Chat,
-                    text: $"Your Telegram Token is: { message.Chat.Id}",
+                    text: $"Your Telegram Token is: {message.Chat.Id}",
                     cancellationToken: cancellationToken
                 );
                 return;
             }
+
             await botClient.SendTextMessageAsync(
                 chatId: message.Chat,
                 text: $"Write /id to get your Telegram Token",
                 cancellationToken: cancellationToken
             );
         }
+
         //Error handling
-        private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
+            CancellationToken cancellationToken)
         {
             var ErrorMessage = exception switch
             {
@@ -167,6 +182,5 @@ namespace BarsantiExplorer.TelegramBot
             Console.WriteLine("Bot started" + BotClient.GetMeAsync());
             return Task.CompletedTask;
         }
-
     }
 }
