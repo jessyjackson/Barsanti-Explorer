@@ -7,57 +7,107 @@ using Telegram.Bot.Exceptions;
 using BarsantiExplorer.Models;
 using BarsantiExplorer.Models.Entities;
 using Telegram.Bot.Types.ReplyMarkups;
+using BarsantiExplorer.Controllers;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using BarsantiExplorer.Enum;
 
 namespace BarsantiExplorer.TelegramBot
 {
     public class Bot : BackgroundService
     {
         private TelegramBotClient BotClient;
-        public Bot(string bot_api)
+        private BarsantiDbContext DB;
+        private Dictionary<int,Dictionary<long,int>> MessagesStatus = new();
+        private string Accept = "Accept";
+        private string Reject = "Reject";
+        public Bot(string bot_api,string connectionString)
         {
             BotClient = new TelegramBotClient(bot_api);
+            var contextOptions = new DbContextOptionsBuilder<BarsantiDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            DB = new BarsantiDbContext(contextOptions.Options);
         }
-        public async void DoWork(BarsantiDbContext db,Comment comment)
+        public List<long> GetUsers()
         {
-            var users = db.Users
+            return DB.Users
                 .Select(el => el.TelegramId)
                 .ToList();
-
+        }
+        public async void DoWork(Comment comment)
+        {
+            var users = GetUsers();
+            if (MessagesStatus.ContainsKey(comment.Id))
+            {
+                MessagesStatus[comment.Id].Clear();
+            }
+            else
+            {
+                MessagesStatus.Add(comment.Id, new Dictionary<long, int>());
+            }
             var inlineKeyboardMarkup = new InlineKeyboardMarkup(new[]
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("Accept"),
-                    InlineKeyboardButton.WithCallbackData("Deny")
+                    InlineKeyboardButton.WithCallbackData(Accept),
+                    InlineKeyboardButton.WithCallbackData(Reject)
                 }
             });
+
+            string text = comment.Id + "\n" + comment.Author + " want to add this comment: \n" + comment.Text;
             foreach (var user in users)
             {
-               await BotClient.SendTextMessageAsync(
+                var tmp = await BotClient.SendTextMessageAsync(
                     chatId: user,
-                    text: "Hello! I am a bot that can echo back your messages. Just type anything and I will send it back to you!",
+                    text: text,
                     replyMarkup: inlineKeyboardMarkup
                 );
+                MessagesStatus[comment.Id].Add(user, tmp.MessageId);
             }
-        }
-        public async void OnCallBack(object sender,CallbackQuery e)
-        {
-            var message = e.Message;
-            var callbackData = e.Data;
-            Console.WriteLine($"Received callback data {callbackData} in chat {message.Chat.Id}.");
-            
+
         }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             //callback handling
             if (update.CallbackQuery != null)
             {
-                Console.WriteLine("Received callback data " + update.CallbackQuery.Data);
+                var username = update.CallbackQuery.Message.Chat.FirstName;
+                var userId = update.CallbackQuery.Message.Chat.Id;
+                var action = update.CallbackQuery.Data;
+                var commentId = Convert.ToInt32(update.CallbackQuery.Message.Text.Split("\n")[0]);
+                if (action == Accept)
+                {
+                    DB.Comments.Find(commentId).Status = CommentStatus.Approved;
+                }
+                else if (action == Reject)
+                {
+                    DB.Comments.Find(commentId).Status = CommentStatus.Rejected;
+                }
+                DB.SaveChanges();
+                foreach(var dict in MessagesStatus[commentId])
+                {
+                    if (dict.Key == userId)
+                    {
+                        await botClient.EditMessageTextAsync(
+                            chatId: dict.Key,
+                            messageId: dict.Value,
+                            text: $"Comment {action}",
+                            cancellationToken: cancellationToken
+                        );
+                    }
+                    else
+                    {
+                        await botClient.EditMessageTextAsync(
+                            chatId: dict.Key,
+                            messageId: dict.Value,
+                            text: $"The comment was {action + " by " + username}",
+                            cancellationToken: cancellationToken
+                        );
+                    }
+
+                }
+                MessagesStatus.Remove(commentId);
+                return;
             }
-
-
-
-
 
             //message handling
             if (update.Message is not { } message)
@@ -70,24 +120,20 @@ namespace BarsantiExplorer.TelegramBot
                 return;
             }
 
-            if (messageText == "/help")
+            if(messageText == "/id")
             {
                 await botClient.SendTextMessageAsync(
                     chatId: message.Chat,
-                    text: "I am a bot that can echo back your messages. Just type anything and I will send it back to you!",
-                    cancellationToken: cancellationToken
-                    );
-            }
-            else if(messageText == "/id")
-            {
-                await botClient.SendTextMessageAsync(
-                    chatId: message.Chat,
-                    text: message.Chat.Id.ToString(),
+                    text: $"Your Telegram Token is: { message.Chat.Id}",
                     cancellationToken: cancellationToken
                 );
+                return;
             }
-
-            Console.WriteLine($"Received a '{messageText}' message in chat {message.Chat.Id}.");
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat,
+                text: $"Write /id to get your Telegram Token",
+                cancellationToken: cancellationToken
+            );
         }
         //Error handling
         private Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

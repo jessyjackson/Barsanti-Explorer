@@ -69,7 +69,6 @@ public class CommentsController : BaseController
         {
             return NotFound();
         }
-        TelegramBot.DoWork(DB,comment);
         return Ok(comment.MapToCommentResponse());
     }
 
@@ -92,6 +91,7 @@ public class CommentsController : BaseController
         };
         DB.Comments.Add(comment);
         DB.SaveChanges();
+        TelegramBot.DoWork(comment);
         return Ok(comment.MapToCommentResponse());
     }
 

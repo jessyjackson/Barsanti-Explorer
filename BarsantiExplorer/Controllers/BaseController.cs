@@ -26,5 +26,6 @@ public class BaseController : Controller
         DB = context;
         AppSettings = appSettings;
         TelegramBot = telegramBot;
+        
     }
 }

@@ -10,10 +10,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
+// database
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+builder.Services.AddDbContext<BarsantiDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 //telegram bot
 Bot telegramBot = new(
-    builder.Configuration["BotApiToken"]
+    builder.Configuration["BotApiToken"],
+    connectionString
 );
 builder.Services.AddHostedService(serviceProvider => telegramBot);
 
@@ -53,11 +59,6 @@ builder.Services.AddAuthentication(cfg =>
     };
 });
 builder.Services.AddAuthorization();
-// database
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddDbContext<BarsantiDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
 
 var app = builder.Build();
 
