@@ -33,7 +33,6 @@ builder.Services.AddScoped<Bot>(_ => telegramBot);
 builder.Services.AddMvc();
 
 
-
 //auth
 var jwtOptions = builder.Configuration
     .GetSection("JwtOptions")
@@ -76,20 +75,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 var uploadsFolder = builder.Configuration["UploadDir"];
-Console.WriteLine($"Uploads folder: {uploadsFolder}");
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, uploadsFolder)),
     RequestPath = $"/{uploadsFolder}"
 });
 
-app.UseStaticFiles();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
