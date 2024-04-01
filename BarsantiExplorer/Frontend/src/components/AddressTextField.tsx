@@ -17,7 +17,6 @@ function AddressTextField(props: AddressTextFieldProps) {
 		props.defaultPlace?.text ?? ""
 	);
 	const [debouncedPlaceText, setDebouncedPlaceText] = React.useState("");
-	const [showSuggestions, setShowSuggestions] = React.useState(false);
 
 	const suggestionsVisibility = useComponentVisible(false);
 
@@ -53,7 +52,6 @@ function AddressTextField(props: AddressTextFieldProps) {
 				value={placeText}
 				ref={placeInputRef}
 				onFocus={() => {
-					setShowSuggestions(true);
 					suggestionsVisibility.setIsComponentVisible(true);
 				}}
 				placeholder="Search for a place..."
@@ -63,27 +61,25 @@ function AddressTextField(props: AddressTextFieldProps) {
 					updateDebouncedVal(e.target.value);
 				}}
 			/>
-			{placesSuggestions.data &&
-				showSuggestions &&
-				suggestionsVisibility.isComponentVisible && (
-					<Card className="absolute bottom-0 left-0 translate-y-[calc(100%+0.5rem)] w-full shadow-lg rounded-lg z-10">
-						{placesSuggestions.data.map((place) => (
-							<div
-								key={place.place_name}
-								className="px-4 py-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
-								onClick={() => onSuggestionClick(place)}
-							>
-								<LuMapPin className="text-primary" />
-								<div>
-									<p>{place.text}</p>
-									<p className="text-sm text-muted-foreground">
-										{place.place_name}
-									</p>
-								</div>
+			{placesSuggestions.data && suggestionsVisibility.isComponentVisible && (
+				<Card className="absolute bottom-0 left-0 translate-y-[calc(100%+0.5rem)] w-full shadow-lg rounded-lg z-10">
+					{placesSuggestions.data.map((place) => (
+						<div
+							key={place.place_name}
+							className="px-4 py-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
+							onClick={() => onSuggestionClick(place)}
+						>
+							<LuMapPin className="text-primary" />
+							<div>
+								<p>{place.text}</p>
+								<p className="text-sm text-muted-foreground">
+									{place.place_name}
+								</p>
 							</div>
-						))}
-					</Card>
-				)}
+						</div>
+					))}
+				</Card>
+			)}
 		</div>
 	);
 }
