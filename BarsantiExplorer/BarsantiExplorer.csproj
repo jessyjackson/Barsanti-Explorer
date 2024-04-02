@@ -12,7 +12,10 @@
     <Folder Include="Migrations\" />
     <Folder Include="uploads\" />
     <Folder Include="uploads\" />
-    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\favicon.svg" />
   </ItemGroup>
 
   <ItemGroup>

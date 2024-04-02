@@ -14,7 +14,7 @@ function Dashboard() {
 			<h1 className="text-3xl font-bold text-center w-full mb-6 mt-20">
 				Trips management
 			</h1>
-			<div className="grid grid-cols-3 gap-4 mx-auto w-max">
+			<div className="grid grid-cols-4 gap-4 mx-auto w-max">
 				<Link to="/admin/trips/new">
 					<Button
 						className="p-8 text-center h-56 w-56 flex flex-col items-center justify-center"
@@ -22,6 +22,14 @@ function Dashboard() {
 					>
 						<MdOutlineLibraryAdd className="text-6xl mx-auto mb-4" />
 						<p className="text-2xl font-bold">Create a trip</p>
+					</Button>
+				</Link>
+				<Link to="/admin/trips-type/new">
+					<Button
+						className="p-8 text-center h-56 w-56 flex flex-col items-center justify-center"
+						variant="outline"
+					>
+						<p className="text-2xl font-bold">Create trip types</p>
 					</Button>
 				</Link>
 				<Link to="/trips">

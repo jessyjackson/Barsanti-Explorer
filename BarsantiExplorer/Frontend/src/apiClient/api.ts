@@ -1296,6 +1296,50 @@ export const TripTypesApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesPost: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('apiTripTypesPost', 'name', name)
+            const localVarPath = `/api/trip-types`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+            if (name !== undefined) { 
+                localVarFormParams.append('Name', name as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1333,6 +1377,18 @@ export const TripTypesApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['TripTypesApi.apiTripTypesIdGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiTripTypesPost(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TripTypeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripTypesPost(name, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TripTypesApi.apiTripTypesPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1363,6 +1419,15 @@ export const TripTypesApiFactory = function (configuration?: Configuration, base
          */
         apiTripTypesIdGet(id: number, options?: any): AxiosPromise<TripTypeResponse> {
             return localVarFp.apiTripTypesIdGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} name 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesPost(name: string, options?: any): AxiosPromise<TripTypeResponse> {
+            return localVarFp.apiTripTypesPost(name, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1397,6 +1462,17 @@ export class TripTypesApi extends BaseAPI {
      */
     public apiTripTypesIdGet(id: number, options?: RawAxiosRequestConfig) {
         return TripTypesApiFp(this.configuration).apiTripTypesIdGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TripTypesApi
+     */
+    public apiTripTypesPost(name: string, options?: RawAxiosRequestConfig) {
+        return TripTypesApiFp(this.configuration).apiTripTypesPost(name, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

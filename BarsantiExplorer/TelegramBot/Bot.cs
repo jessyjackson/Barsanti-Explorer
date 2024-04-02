@@ -56,7 +56,7 @@ namespace BarsantiExplorer.TelegramBot
                 }
             });
 
-            string text = comment.Id + "\n" + comment.Author + " want to add this comment: \n" + comment.Text;
+            string text = comment.Id + "\n" + "Rating: " +comment.Rating + "\n" + comment.Author + " want to add this comment: \n" + comment.Text;
             foreach (var id in telegramIds)
             {
                 try

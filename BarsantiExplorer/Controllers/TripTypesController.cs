@@ -2,6 +2,7 @@ using BarsantiExplorer.Models;
 using BarsantiExplorer.Models.Entities;
 using BarsantiExplorer.Models.Requests.TripTypes;
 using BarsantiExplorer.Models.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Dynamic.Core;
 
@@ -60,6 +61,24 @@ public class TripTypesController : BaseController
             return NotFound();
         }
 
+        return Ok(tripType);
+    }
+    ///<summary
+    ///+Create a new trip-type
+    /// </summary>
+    /// <response code="200">Returns the new trip-type data</response> 
+    [Authorize]
+    [HttpPost("")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(TripTypeResponse), StatusCodes.Status200OK)]
+    public IActionResult CreateTripType([FromForm] CreateTripTypesRequest request)
+    {
+        var tripType = new TripType
+        {
+            Name = request.Name
+        };
+        DB.TripTypes.Add(tripType);
+        DB.SaveChanges();
         return Ok(tripType);
     }
 }

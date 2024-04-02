@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import CreateTripPage from "./pages/admin/CreateTripPage";
+import CreateTripTypesPage from "./pages/admin/CreateTripTypesPage";
 import Header from "./components/Header";
 import LandingPage from "./pages/LandingPage";
 import Footer from "./components/Footer";
@@ -36,6 +37,7 @@ function App() {
 						<Route path="/admin" element={<Dashboard />} />
 						<Route path="/admin/telegram" element={<SyncTelegramPage />} />
 						<Route path="/admin/trips/new" element={<CreateTripPage />} />
+						<Route path="/admin/trips-type/new" element={<CreateTripTypesPage />} />
 						<Route path="/admin/trips/:id" element={<EditTripPage />} />
 					</Route>
 				</Routes>

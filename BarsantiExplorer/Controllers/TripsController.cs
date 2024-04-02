@@ -50,7 +50,6 @@ public class TripsController : BaseController
             trips = trips.Where(el =>
                 el.Title.Contains(queryParams.Search) || el.Description.Contains(queryParams.Search));
         }
-
         if (queryParams.Latitude != null && queryParams.Longitude != null)
         {
             var geoHashPrecision = queryParams.GeoHashPrecision ?? 4;
@@ -139,8 +138,8 @@ public class TripsController : BaseController
         }
 
         // calculate geo hash
-        double latitude = double.Parse(body.Latitude.Replace(".", ","));
-        double longitude = double.Parse(body.Longitude.Replace(".", ","));
+        double latitude = double.Parse(body.Latitude);
+        double longitude = double.Parse(body.Longitude);
         var geoHash = _geoHasher.Encode(latitude, longitude, 6);
 
         var trip = new Trip
