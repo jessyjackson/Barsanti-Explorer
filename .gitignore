@@ -398,7 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 *.Development.json
-
+*.Production.json
 */uploads/**
 */Uploads/**
 BarsantiExplorer/appsettings.json
