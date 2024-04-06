@@ -91,7 +91,7 @@ public class CommentsController : BaseController
         };
         DB.Comments.Add(comment);
         DB.SaveChanges();
-        TelegramBot.DoWork(comment);
+        TelegramBot.SendNewCommentToAdmin(comment);
         return Ok(comment.MapToCommentResponse());
     }
 

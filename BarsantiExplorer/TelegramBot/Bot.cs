@@ -11,16 +11,17 @@ using BarsantiExplorer.Controllers;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using BarsantiExplorer.Enum;
+using System.Threading;
 
 namespace BarsantiExplorer.TelegramBot
 {
     public class Bot : BackgroundService
     {
-        private TelegramBotClient BotClient;
-        private BarsantiDbContext DB;
-        private Dictionary<int, Dictionary<long, int>> MessagesStatus = new();
-        private string Accept = "Accept";
-        private string Reject = "Reject";
+        private readonly TelegramBotClient BotClient;
+        private readonly BarsantiDbContext DB;
+        private Dictionary<int, Dictionary<long, int>> MessagesStatus;
+        private readonly string Accept = "Accept";
+        private readonly string Reject = "Reject";
 
         public Bot(string bot_api, string connectionString)
         {
@@ -29,22 +30,24 @@ namespace BarsantiExplorer.TelegramBot
                 new DbContextOptionsBuilder<BarsantiDbContext>().UseMySql(connectionString,
                     ServerVersion.AutoDetect(connectionString));
             DB = new BarsantiDbContext(contextOptions.Options);
+            MessagesStatus = new Dictionary<int, Dictionary<long, int>>();
         }
 
-        public async void DoWork(Comment comment)
+        public async void SendNewCommentToAdmin(Comment comment)
         {
             var telegramIds = DB.Users
                 .Where(el => el.TelegramId != null)
                 .Select(el => el.TelegramId!.Value)
                 .ToList();
+            var trip = DB.Trips.Find(comment.TripId);
 
-            if (MessagesStatus.ContainsKey(comment.Id))
+            if (MessagesStatus.TryGetValue(comment.Id, out Dictionary<long, int>? value))
             {
-                MessagesStatus[comment.Id].Clear();
+                value.Clear();
             }
             else
             {
-                MessagesStatus.Add(comment.Id, new Dictionary<long, int>());
+                MessagesStatus.Add(comment.Id, []);
             }
 
             var inlineKeyboardMarkup = new InlineKeyboardMarkup(new[]
@@ -56,7 +59,7 @@ namespace BarsantiExplorer.TelegramBot
                 }
             });
 
-            string text = comment.Id + "\n" + "Rating: " +comment.Rating + "\n" + comment.Author + " want to add this comment: \n" + comment.Text;
+            string text = comment.Id + "\n" + "Under: " + trip.Title + "\n" +  "Rating: " + comment.Rating + "\n" + "Author: " + comment.Author +"\n" + "Comment: " +comment.Text;
             foreach (var id in telegramIds)
             {
                 try
@@ -74,64 +77,49 @@ namespace BarsantiExplorer.TelegramBot
                 }
             }
         }
-
-        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
-            CancellationToken cancellationToken)
+        private async void HandleCallBack(ITelegramBotClient botClient, Update update,CancellationToken cancellationToken)
         {
-            //callback handling
-            if (update.CallbackQuery != null)
+            var username = update.CallbackQuery.Message.Chat.FirstName;
+            var userId = update.CallbackQuery.Message.Chat.Id;
+            var action = update.CallbackQuery.Data;
+            var commentId = Convert.ToInt32(update.CallbackQuery.Message.Text.Split("\n")[0]);
+            if (action == Accept)
             {
-                var username = update.CallbackQuery.Message.Chat.FirstName;
-                var userId = update.CallbackQuery.Message.Chat.Id;
-                var action = update.CallbackQuery.Data;
-                var commentId = Convert.ToInt32(update.CallbackQuery.Message.Text.Split("\n")[0]);
-                if (action == Accept)
-                {
-                    DB.Comments.Find(commentId).Status = CommentStatus.Approved;
-                }
-                else if (action == Reject)
-                {
-                    DB.Comments.Find(commentId).Status = CommentStatus.Rejected;
-                }
-
-                DB.SaveChanges();
-                foreach (var dict in MessagesStatus[commentId])
-                {
-                    if (dict.Key == userId)
-                    {
-                        await botClient.EditMessageTextAsync(
-                            chatId: dict.Key,
-                            messageId: dict.Value,
-                            text: $"Comment {action}",
-                            cancellationToken: cancellationToken
-                        );
-                    }
-                    else
-                    {
-                        await botClient.EditMessageTextAsync(
-                            chatId: dict.Key,
-                            messageId: dict.Value,
-                            text: $"The comment was {action + " by " + username}",
-                            cancellationToken: cancellationToken
-                        );
-                    }
-                }
-
-                MessagesStatus.Remove(commentId);
-                return;
+                DB.Comments.Find(commentId).Status = CommentStatus.Approved;
+            }
+            else if (action == Reject)
+            {
+                DB.Comments.Find(commentId).Status = CommentStatus.Rejected;
             }
 
-            //message handling
-            if (update.Message is not { } message)
+            DB.SaveChanges();
+            foreach (var dict in MessagesStatus[commentId])
             {
-                return;
+                if (dict.Key == userId)
+                {
+                    await botClient.EditMessageTextAsync(
+                        chatId: dict.Key,
+                        messageId: dict.Value,
+                        text: $"Comment {action}",
+                        cancellationToken: cancellationToken
+                    );
+                }
+                else
+                {
+                    await botClient.EditMessageTextAsync(
+                        chatId: dict.Key,
+                        messageId: dict.Value,
+                        text: $"The comment was {action + " by " + username}",
+                        cancellationToken: cancellationToken
+                    );
+                }
             }
 
-            if (message.Text is not { } messageText)
-            {
-                return;
-            }
-
+            MessagesStatus.Remove(commentId);
+            return;
+        }
+        private async void HandleMessage(Message message,string messageText, ITelegramBotClient botClient, CancellationToken cancellationToken)
+        {
             if (messageText == "/id")
             {
                 await botClient.SendTextMessageAsync(
@@ -147,6 +135,21 @@ namespace BarsantiExplorer.TelegramBot
                 text: $"Write /id to get your Telegram Token",
                 cancellationToken: cancellationToken
             );
+        }
+        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+            CancellationToken cancellationToken)
+        {
+            //callback handling
+            if (update.CallbackQuery != null)
+            {
+                HandleCallBack(botClient, update, cancellationToken);
+            }
+            //message handling
+            if(update.Message != null && update.Message.Text != null)
+            {
+                HandleMessage(update.Message,update.Message.Text, botClient, cancellationToken);
+            }
+
         }
 
         //Error handling

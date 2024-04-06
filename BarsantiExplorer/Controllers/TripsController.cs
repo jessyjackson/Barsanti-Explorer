@@ -199,8 +199,8 @@ public class TripsController : BaseController
             trip.Image = uniqueFileName;
         }
 
-        if (body.Latitude != null) trip.Latitude = double.Parse(body.Latitude.Replace(".", ","));
-        if (body.Longitude != null) trip.Longitude = double.Parse(body.Longitude.Replace(".", ","));
+        if (body.Latitude != null) trip.Latitude = double.Parse(body.Latitude);
+        if (body.Longitude != null) trip.Longitude = double.Parse(body.Longitude);
         if (body.Title != null) trip.Title = body.Title;
         if (body.Description != null) trip.Description = body.Description;
         if (body.Address != null) trip.Address = body.Address;

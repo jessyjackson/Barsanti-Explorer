@@ -221,7 +221,7 @@ function TripDetailsPage() {
 				<img
 					src={trip.image!}
 					alt="location of the trip"
-					className="flex-1 max-h-[30rem] rounded-lg object-cover"
+					className="flex-1 max-h-[30rem] rounded-lg object-cover max-w-2xl"
 				/>
 				<div className="flex-1">
 					<h1 className="text-4xl font-bold">{trip.title}</h1>
@@ -281,7 +281,7 @@ function TripDetailsPage() {
 					{commentsQuery.data?.pages.map((page, index) => (
 						<React.Fragment key={index}>
 							{page.map((comment) => (
-								<Card key={comment.id} className="mt-4 p-4">
+								<Card key={comment.id} className="mt-4 p-4 text-wrap">
 									<h3 className="text-xl font-semibold">{comment.author}</h3>
 									<Rating rating={comment.rating ?? 0} className="mt-2 gap-3" />
 									<p className="mt-2">{comment.text}</p>

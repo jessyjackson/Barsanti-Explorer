@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LiaTelegramPlane } from "react-icons/lia";
 import { FiEdit } from "react-icons/fi";
 import { MdOutlineLibraryAdd } from "react-icons/md";
+import { MdOutlineDescription } from "react-icons/md";
 import { BiLogOutCircle } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
@@ -24,12 +25,13 @@ function Dashboard() {
 						<p className="text-2xl font-bold">Create a trip</p>
 					</Button>
 				</Link>
-				<Link to="/admin/trips-type/new">
+				<Link to="/admin/trips-type">
 					<Button
 						className="p-8 text-center h-56 w-56 flex flex-col items-center justify-center"
 						variant="outline"
 					>
-						<p className="text-2xl font-bold">Create trip types</p>
+						<MdOutlineDescription className="text-6xl mx-auto mb-4" />
+						<p className="text-2xl font-bold">Trip types</p>
 					</Button>
 				</Link>
 				<Link to="/trips">

@@ -35,11 +35,8 @@ function TripTypesForm(props: TripTypeFormProps) {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(props.onSubmit)}
-                className="max-w-2xl w-full mx-auto"
+                className="max-w-4xl w-full mx-auto"
             >
-                <h1 className="text-3xl font-bold">
-                    Create Trip Type
-                </h1>
                 <FormField
                     control={form.control}
                     name="title"
@@ -58,7 +55,7 @@ function TripTypesForm(props: TripTypeFormProps) {
                     className="w-full mt-6"
                     loading={form.formState.isSubmitting}
                 >
-                    Create Trip Type
+                    Create a new type
                 </Button>
             </form>
         </Form>
