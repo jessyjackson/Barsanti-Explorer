@@ -91,7 +91,7 @@ public class CommentsController : BaseController
         };
         DB.Comments.Add(comment);
         DB.SaveChanges();
-        TelegramBot.SendNewCommentToAdmin(comment);
+        TelegramBot!.SendNewCommentToAdmin(comment);
         return Ok(comment.MapToCommentResponse());
     }
 
@@ -100,7 +100,7 @@ public class CommentsController : BaseController
     /// </summary>
     /// <response code="200">Returns the comment data</response> 
     /// <response code="404">If the comment was not found</response>
-    /// <responde code="400">If the status is invalid</response>
+    /// <response code="400">If the status is invalid</response>
     [HttpPost("{id}")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CommentResponse), StatusCodes.Status200OK)]

@@ -20,8 +20,8 @@ namespace BarsantiExplorer.TelegramBot
         private readonly TelegramBotClient BotClient;
         private readonly BarsantiDbContext DB;
         private Dictionary<int, Dictionary<long, int>> MessagesStatus;
-        private readonly string Accept = "Accept";
-        private readonly string Reject = "Reject";
+        private readonly string Accept = "Accepted";
+        private readonly string Reject = "Rejected";
 
         public Bot(string bot_api, string connectionString)
         {
@@ -59,7 +59,7 @@ namespace BarsantiExplorer.TelegramBot
                 }
             });
 
-            string text = comment.Id + "\n" + "Under: " + trip.Title + "\n" +  "Rating: " + comment.Rating + "\n" + "Author: " + comment.Author +"\n" + "Comment: " +comment.Text;
+            string text = comment.Id + "\n" + "Under: " + trip?.Title + "\n" +  "Rating: " + comment.Rating + "\n" + "Author: " + comment.Author +"\n" + "Comment: " +comment.Text;
             foreach (var id in telegramIds)
             {
                 try
@@ -77,7 +77,7 @@ namespace BarsantiExplorer.TelegramBot
                 }
             }
         }
-        private async void HandleCallBack(ITelegramBotClient botClient, Update update,CancellationToken cancellationToken)
+        private async Task HandleCallBack(ITelegramBotClient botClient, Update update,CancellationToken cancellationToken)
         {
             var username = update.CallbackQuery.Message.Chat.FirstName;
             var userId = update.CallbackQuery.Message.Chat.Id;
@@ -85,11 +85,11 @@ namespace BarsantiExplorer.TelegramBot
             var commentId = Convert.ToInt32(update.CallbackQuery.Message.Text.Split("\n")[0]);
             if (action == Accept)
             {
-                DB.Comments.Find(commentId).Status = CommentStatus.Approved;
+                DB.Comments.Find(commentId)!.Status = CommentStatus.Approved;
             }
             else if (action == Reject)
             {
-                DB.Comments.Find(commentId).Status = CommentStatus.Rejected;
+                DB.Comments.Find(commentId)!.Status = CommentStatus.Rejected;
             }
 
             DB.SaveChanges();
@@ -118,7 +118,7 @@ namespace BarsantiExplorer.TelegramBot
             MessagesStatus.Remove(commentId);
             return;
         }
-        private async void HandleMessage(Message message,string messageText, ITelegramBotClient botClient, CancellationToken cancellationToken)
+        private static async Task HandleMessage(Message message,string messageText, ITelegramBotClient botClient, CancellationToken cancellationToken)
         {
             if (messageText == "/id")
             {
@@ -142,12 +142,14 @@ namespace BarsantiExplorer.TelegramBot
             //callback handling
             if (update.CallbackQuery != null)
             {
-                HandleCallBack(botClient, update, cancellationToken);
+                await HandleCallBack(botClient, update, cancellationToken);
+                return;
             }
             //message handling
             if(update.Message != null && update.Message.Text != null)
             {
-                HandleMessage(update.Message,update.Message.Text, botClient, cancellationToken);
+                await HandleMessage(update.Message,update.Message.Text, botClient, cancellationToken);
+                return;
             }
 
         }
@@ -182,7 +184,7 @@ namespace BarsantiExplorer.TelegramBot
                 cancellationToken: cts.Token
             );
 
-            Console.WriteLine("Bot started" + BotClient.GetMeAsync());
+            Console.WriteLine("Bot: " + BotClient.GetMyNameAsync(cancellationToken: stoppingToken).Result.Name);
             return Task.CompletedTask;
         }
     }

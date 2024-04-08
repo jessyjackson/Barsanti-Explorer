@@ -281,10 +281,10 @@ function TripDetailsPage() {
 					{commentsQuery.data?.pages.map((page, index) => (
 						<React.Fragment key={index}>
 							{page.map((comment) => (
-								<Card key={comment.id} className="mt-4 p-4 text-wrap">
+								<Card key={comment.id} className="mt-4 p-4">
 									<h3 className="text-xl font-semibold">{comment.author}</h3>
 									<Rating rating={comment.rating ?? 0} className="mt-2 gap-3" />
-									<p className="mt-2">{comment.text}</p>
+									<p className="mt-2 w-full break-words">{comment.text}</p>
 								</Card>
 							))}
 						</React.Fragment>

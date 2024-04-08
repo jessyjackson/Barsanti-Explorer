@@ -19,7 +19,7 @@ function TripCard(props: TripCardProps) {
 			className="flex flex-col cursor-pointer overflow-hidden"
 			onClick={() => navigate(`/trips/${props.trip.id}`)}
 		>
-			<img src={props.trip.image!} alt="location place" className="h-72" />
+			<img src={props.trip.image!} alt="location place" className="h-72 object-cover" />
 			<div className="p-4">
 				<h3 className="text-xl font-semibold">{props.trip.title}</h3>
 				<Rating rating={props.trip.averageRating ?? 0} showNumber />
