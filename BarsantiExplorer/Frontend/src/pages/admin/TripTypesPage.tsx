@@ -7,9 +7,11 @@ import TripTypeCard from "@/components/TripTypeCard";
 import { useQuery } from "@tanstack/react-query";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
+
 function CreateTripTypesPage() {
     const navigate = useNavigate(); 
     const {toast}  = useToast();
+
 
     const tripTypesQuery = useQuery({
         queryKey: ["tripTypes"],
@@ -67,7 +69,7 @@ function CreateTripTypesPage() {
                 <h1 className="text-3xl font-bold mt-10">Existing types</h1>
                 <div className="grid grid-cols-3 gap-10 mt-7">
                     {tripTypesQuery.data?.map((tripType) => (
-                        <TripTypeCard title={tripType.name} key={`tripType-${tripType.id}`} />
+                        <TripTypeCard type={tripType} key={`tripType-${tripType.id}`} />
                     ))}
                 </div>
             </div>

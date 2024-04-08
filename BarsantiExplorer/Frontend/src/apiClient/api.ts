@@ -917,6 +917,7 @@ export const CommentsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @summary Accept deny comment
          * @param {number} id 
          * @param {AcceptCommentRequest} [acceptCommentRequest] 
          * @param {*} [options] Override http request option.
@@ -1047,6 +1048,7 @@ export const CommentsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Accept deny comment
          * @param {number} id 
          * @param {AcceptCommentRequest} [acceptCommentRequest] 
          * @param {*} [options] Override http request option.
@@ -1115,6 +1117,7 @@ export const CommentsApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @summary Accept deny comment
          * @param {number} id 
          * @param {AcceptCommentRequest} [acceptCommentRequest] 
          * @param {*} [options] Override http request option.
@@ -1183,6 +1186,7 @@ export class CommentsApi extends BaseAPI {
 
     /**
      * 
+     * @summary Accept deny comment
      * @param {number} id 
      * @param {AcceptCommentRequest} [acceptCommentRequest] 
      * @param {*} [options] Override http request option.
@@ -1246,6 +1250,44 @@ export const TripTypesApiAxiosParamCreator = function (configuration?: Configura
             if (sort !== undefined) {
                 localVarQueryParameter['Sort'] = sort;
             }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete a trip type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesIdDelete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('apiTripTypesIdDelete', 'id', id)
+            const localVarPath = `/api/trip-types/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -1366,6 +1408,19 @@ export const TripTypesApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Delete a trip type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiTripTypesIdDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTripTypesIdDelete(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TripTypesApi.apiTripTypesIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get a trip-type
          * @param {number} id 
          * @param {*} [options] Override http request option.
@@ -1412,6 +1467,16 @@ export const TripTypesApiFactory = function (configuration?: Configuration, base
         },
         /**
          * 
+         * @summary Delete a trip type
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiTripTypesIdDelete(id: number, options?: any): AxiosPromise<boolean> {
+            return localVarFp.apiTripTypesIdDelete(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get a trip-type
          * @param {number} id 
          * @param {*} [options] Override http request option.
@@ -1450,6 +1515,18 @@ export class TripTypesApi extends BaseAPI {
      */
     public apiTripTypesGet(search?: string, sort?: string, options?: RawAxiosRequestConfig) {
         return TripTypesApiFp(this.configuration).apiTripTypesGet(search, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete a trip type
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TripTypesApi
+     */
+    public apiTripTypesIdDelete(id: number, options?: RawAxiosRequestConfig) {
+        return TripTypesApiFp(this.configuration).apiTripTypesIdDelete(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -81,4 +81,27 @@ public class TripTypesController : BaseController
         DB.SaveChanges();
         return Ok(tripType);
     }
+    /// <summary>
+    /// Delete a trip type
+    /// </summary>
+    /// <response code="200">Returns true if the trip type was deleted successfully</response>
+    [Authorize]
+    [HttpDelete("{id}")]
+    [Produces("application/json")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public IActionResult DeleteTripType(int id)
+    {
+        var tripType = DB.TripTypes
+            .Where(el => el.DeletedAt == null)
+            .FirstOrDefault(el => el.Id == id);
+
+        if (tripType == null)
+        {
+            return NotFound();
+        }
+
+        tripType.DeletedAt = DateTime.Now;
+        DB.SaveChanges();
+        return Ok(true);
+    }
 }
