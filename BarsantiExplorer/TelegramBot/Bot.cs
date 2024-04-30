@@ -1,17 +1,13 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Args;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Exceptions;
+﻿using BarsantiExplorer.Enum;
 using BarsantiExplorer.Models;
 using BarsantiExplorer.Models.Entities;
-using Telegram.Bot.Types.ReplyMarkups;
-using BarsantiExplorer.Controllers;
-using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using BarsantiExplorer.Enum;
-using System.Threading;
+using Telegram.Bot;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BarsantiExplorer.TelegramBot
 {
@@ -59,7 +55,7 @@ namespace BarsantiExplorer.TelegramBot
                 }
             });
 
-            string text = comment.Id + "\n" + "Under: " + trip?.Title + "\n" +  "Rating: " + comment.Rating + "\n" + "Author: " + comment.Author +"\n" + "Comment: " +comment.Text;
+            string text = comment.Id + "\n" + "Under: " + trip?.Title + "\n" + "Rating: " + comment.Rating + "\n" + "Author: " + comment.Author + "\n" + "Comment: " + comment.Text;
             foreach (var id in telegramIds)
             {
                 try
@@ -71,13 +67,19 @@ namespace BarsantiExplorer.TelegramBot
                     );
                     MessagesStatus[comment.Id].Add(id, tmp.MessageId);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    Console.WriteLine(e);
+                    var ErrorMessage = exception switch
+                    {
+                        ApiRequestException apiRequestException
+                            => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                        _ => exception.ToString()
+                    };
+                    Console.WriteLine(ErrorMessage);
                 }
             }
         }
-        private async Task HandleCallBack(ITelegramBotClient botClient, Update update,CancellationToken cancellationToken)
+        private async Task HandleCallBack(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             var username = update.CallbackQuery.Message.Chat.FirstName;
             var userId = update.CallbackQuery.Message.Chat.Id;
@@ -118,14 +120,32 @@ namespace BarsantiExplorer.TelegramBot
             MessagesStatus.Remove(commentId);
             return;
         }
-        private static async Task HandleMessage(Message message,string messageText, ITelegramBotClient botClient, CancellationToken cancellationToken)
+        private static async Task HandleMessage(Message message, string messageText, ITelegramBotClient botClient, CancellationToken cancellationToken)
         {
-            if (messageText == "/id")
+            if (messageText == "/id" || messageText == "/Id" || messageText == "/ID")
             {
                 await botClient.SendTextMessageAsync(
                     chatId: message.Chat,
                     text: $"Your Telegram Token is: {message.Chat.Id}",
                     cancellationToken: cancellationToken
+                );
+                return;
+            }
+            if (messageText == "/start" || messageText == "/help" || messageText == "/Start" || messageText == "/Help")
+            {
+                await botClient.SendTextMessageAsync(
+                      chatId: message.Chat,
+                      text: $"Welcome to our Barsanti Explorer Bot!\r\n\r\n" +
+                      $"Our Comment Moderator Bot helps manage user comments by allowing you to accept or deny comments submitted by users. Whether you want to maintain a positive community atmosphere or ensure that only appropriate comments are displayed, our bot has got you covered.\r\n\r\n" +
+                      $"Key Features:\r\n\r\n" +
+                      $"1) Accept or Deny Comments: With just a few clicks, you can review comments submitted by users and decide whether to accept or deny them for display.\r\n" +
+                      $"2) Real-Time Notifications: Receive instant notifications whenever a new comment is submitted, allowing you to promptly review and take action.\r\n" +
+                      $"3) Secure and Reliable: Rest assured that your data and interactions with the bot are kept secure and confidential.\r\n\r\n" +
+                      $"How to Use:\r\n\r\n" +
+                      $"1) Send /id to get your telegram id\r\n" +
+                      $"2) Put It on the website in the sync telegram section\r\n" +
+                      $"3) Accept or deny by simple press the buttons that will appear under the message",
+                      cancellationToken: cancellationToken
                 );
                 return;
             }
@@ -146,9 +166,9 @@ namespace BarsantiExplorer.TelegramBot
                 return;
             }
             //message handling
-            if(update.Message != null && update.Message.Text != null)
+            if (update.Message != null && update.Message.Text != null)
             {
-                await HandleMessage(update.Message,update.Message.Text, botClient, cancellationToken);
+                await HandleMessage(update.Message, update.Message.Text, botClient, cancellationToken);
                 return;
             }
 
