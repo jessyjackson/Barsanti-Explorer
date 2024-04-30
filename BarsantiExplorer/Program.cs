@@ -83,6 +83,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 var uploadsFolder = builder.Configuration["UploadDir"];
+if (!Directory.Exists(uploadsFolder))
+{
+    Directory.CreateDirectory(uploadsFolder);
+}
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, uploadsFolder)),
