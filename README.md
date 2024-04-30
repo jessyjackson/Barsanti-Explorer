@@ -8,6 +8,10 @@ Written with React, Typescript, Tilewind css for frontend and .Net for backend, 
 
 ![Preview](./assets/home.png)
 
+## Trip preview
+
+![Preview](./assets/tripCard.png)
+
 ## Login Preview
 
 ![Preview](./assets/login.png)
