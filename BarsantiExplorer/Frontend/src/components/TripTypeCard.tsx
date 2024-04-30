@@ -83,9 +83,9 @@ function TripTypeCard(props: TripTypeCardProps) {
             <h3 className="text-xl font-semibold">{props.type.name}</h3>
             <Button 
             variant="ghost"
-            className="text-4xl absolute right-5"
+            className="text-destructive text-4xl absolute right-5"
             onClick={() => setDeleteDialogOpen(true)}>
-                  <GoTrash color="red"/>
+            <GoTrash/>
             </Button>
         </div>
       </Card>
